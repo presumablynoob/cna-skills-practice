@@ -4,14 +4,15 @@ A single-page practice tool for the 23 nurse aide skills on the Credentia skills
 
 ## Modes
 
-The two practice modes draw a skill at random; there is no skill picker.
-
-- **Step practice**: a random skill, then at random either putting its steps back in
-  sequence or marking its critical element steps (missing one fails the skill). Each round
-  is labelled "Determine Order" or "Critical Steps" above the skill name.
-- **Recall flashcards**: say each step out loud, then reveal it.
-- **Review all skills**: every skill and every step in order, critical steps tagged, as
+- **Test Skills**: draws a skill at random, then at random either puts its steps back in
+  sequence or asks you to mark its critical element steps (missing one fails the skill).
+  Each round is labelled "Determine Order" or "Critical Steps" above the skill name. There
+  is no skill picker.
+- **Skills**: every skill and every step in order, critical steps bold and tagged, as
   collapsible sections. For looking something up rather than being tested on it.
+
+Critical steps are shown bold wherever they are revealed, never before, so a "Critical Steps"
+round does not give away its own answer.
 
 ## Run it
 
@@ -25,9 +26,9 @@ Hosting is GitHub Pages, serving `main` at the repository root. Pushing to `main
 
 All skill data lives in the `S` array near the top of the script in `index.html`. Each skill is
 `["Name", [["step text"], ["critical step text", 1], ...]]`, where a trailing `1` marks a critical step.
-Step practice, flashcards and review all read from that one array.
+Both tabs read from that one array.
 
-Skills 5, 17 and 19 currently have no step flagged critical, so step practice always gives them
+Skills 5, 17 and 19 currently have no step flagged critical, so Test Skills always gives them
 the ordering task rather than an unanswerable "spot the critical steps" round. Add a trailing `1`
 to the relevant steps if your state's handbook marks any.
 

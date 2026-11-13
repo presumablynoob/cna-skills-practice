@@ -38,9 +38,6 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--bad2);color:var(--bad);margin-left:6px;white-space:nowrap}
 .score{font-weight:600;margin:10px 0}
 .opt{margin:6px 0}
-.flash{min-height:120px}
-.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0 14px}
-.prog i{display:block;height:100%;background:var(--acc)}
 .rev{border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--card)}
 .rev summary{padding:10px 12px;cursor:pointer;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;list-style:none}
 .rev summary::-webkit-details-marker{display:none}
@@ -92,7 +89,7 @@ const S=[
 const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const app=document.getElementById('app');
-const MODES=[["drill","Step practice"],["flash","Recall flashcards"],["review","Review all skills"]];
+const MODES=[["drill","Test Skills"],["review","Skills"]];
 let mode="drill",skill=-1;
 const tabs=document.getElementById('tabs');
 MODES.forEach(([k,l])=>{const b=document.createElement('button');b.className='tab';b.textContent=l;b.onclick=()=>{mode=k;render()};b.dataset.k=k;tabs.appendChild(b)});
@@ -102,8 +99,7 @@ function nextSkill(){const p=skill;do{skill=Math.random()*S.length|0}while(S.len
 // Skills with no critical steps flagged always get the ordering task, so a round
 // is never unanswerable.
 function drill(){nextSkill();(S[skill][1].some(s=>s[1])&&Math.random()<.5?crit:order)()}
-function flashNew(){nextSkill();flash()}
-function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,flash:flashNew,review})[mode]()}
+function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,review})[mode]()}
 
 function order(){
   const steps=S[skill][1];const idx=shuf(steps.map((_,i)=>i));let picked=[];
@@ -116,8 +112,8 @@ function order(){
   }
   function check(){
     let right=0;
-    pool.innerHTML=picked.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n">${pos+1}</span><span>${esc(steps[i][0])}${steps[i][1]?'<span class="tag">critical</span>':''}${ok?'':`<br><small style="color:var(--mute)">Should be step ${i+1}</small>`}</span></div>`}).join('');
-    out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol>${steps.map(s=>`<li>${esc(s[0])}${s[1]?'<span class="tag">critical</span>':''}</li>`).join('')}</ol></details>`;
+    pool.innerHTML=picked.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n">${pos+1}</span><span>${steps[i][1]?`<strong>${esc(steps[i][0])}</strong><span class="tag">critical</span>`:esc(steps[i][0])}${ok?'':`<br><small style="color:var(--mute)">Should be step ${i+1}</small>`}</span></div>`}).join('');
+    out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol>${steps.map(s=>`<li>${s[1]?`<strong>${esc(s[0])}</strong><span class="tag">critical</span>`:esc(s[0])}</li>`).join('')}</ol></details>`;
   }
   document.getElementById('undo').onclick=()=>{picked.pop();draw()};
   document.getElementById('again').onclick=order;
@@ -135,27 +131,16 @@ function crit(){
     let hit=0,miss=0,fp=0;
     l.querySelectorAll('.item').forEach(b=>{const i=+b.dataset.i,c=!!steps[i][1],s=sel.has(i);b.classList.remove('sel');b.style.pointerEvents='none';
       if(c&&s){b.classList.add('ok');hit++}else if(c){b.classList.add('miss');miss++}else if(s){b.classList.add('no');fp++}
-      if(c)b.querySelector('span:last-child').insertAdjacentHTML('beforeend','<span class="tag">critical</span>')});
+      if(c){const t=b.querySelector('span:last-child');t.innerHTML=`<strong>${t.innerHTML}</strong><span class="tag">critical</span>`}});
     document.getElementById('out').innerHTML=`<p class="score">${hit} found · ${miss} missed · ${fp} wrongly marked</p><p class="hint">Green = got it, yellow = missed critical step, red = not critical.</p>`;
     document.getElementById('chk').textContent='Try another';document.getElementById('chk').onclick=drill;
   };
 }
 
-function flash(){
-  const steps=S[skill][1];let shown=0;
-  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Say each step out loud, then reveal it to check yourself.</p><div class="prog"><i id="pg" style="width:0"></i></div><div class="list flash" id="l"></div><div class="row"><button class="b p" id="nx">Reveal next step</button><button class="b" id="all">Show all</button><button class="b" id="new">Next skill</button></div>`;
-  const l=document.getElementById('l');
-  function draw(){l.innerHTML=steps.slice(0,shown).map((s,i)=>`<div class="item"><span class="n">${i+1}</span><span>${esc(s[0])}${s[1]?'<span class="tag">critical</span>':''}</span></div>`).join('')||'<p class="hint">What\'s step 1?</p>';document.getElementById('pg').style.width=(shown/steps.length*100)+'%';const nx=document.getElementById('nx');nx.disabled=shown>=steps.length;nx.textContent=shown>=steps.length?'Done':`Reveal step ${shown+1}`}
-  document.getElementById('nx').onclick=()=>{shown++;draw()};
-  document.getElementById('all').onclick=()=>{shown=steps.length;draw()};
-  document.getElementById('new').onclick=flashNew;
-  draw();
-}
-
 function review(){
   const n=s=>s[1].filter(x=>x[1]).length;
   app.innerHTML=`<p class="hint">All ${S.length} skills with their steps in order. Critical element steps are tagged — missing one fails the skill.</p><div class="row"><button class="b" id="exp">Expand all</button><button class="b" id="col">Collapse all</button></div>`+
-    S.map((sk,i)=>`<details class="rev"><summary><strong>${i+1}. ${esc(sk[0])}</strong><span class="cnt">${sk[1].length} steps${n(sk)?` · ${n(sk)} critical`:''}</span></summary><ol class="revl">${sk[1].map(st=>`<li>${esc(st[0])}${st[1]?'<span class="tag">critical</span>':''}</li>`).join('')}</ol></details>`).join('');
+    S.map((sk,i)=>`<details class="rev"><summary><strong>${i+1}. ${esc(sk[0])}</strong><span class="cnt">${sk[1].length} steps${n(sk)?` · ${n(sk)} critical`:''}</span></summary><ol class="revl">${sk[1].map(st=>`<li>${st[1]?`<strong>${esc(st[0])}</strong><span class="tag">critical</span>`:esc(st[0])}</li>`).join('')}</ol></details>`).join('');
   const all=o=>app.querySelectorAll('details.rev').forEach(d=>d.open=o);
   document.getElementById('exp').onclick=()=>all(true);
   document.getElementById('col').onclick=()=>all(false);
