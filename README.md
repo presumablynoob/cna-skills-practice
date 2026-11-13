@@ -11,9 +11,11 @@ A single-page practice tool for the 23 nurse aide skills on the Credentia skills
 
 ## Run it
 
-Open `index.html` in any browser. No build step and no dependencies.
+Live at <https://presumablynoob.github.io/cna-skills-practice/>.
 
-To host it, enable GitHub Pages (Settings → Pages → Deploy from branch → `main` / root).
+Locally, open `index.html` in any browser. No build step and no dependencies.
+
+Hosting is GitHub Pages, serving `main` at the repository root. Pushing to `main` redeploys it.
 
 ## Editing skills
 
