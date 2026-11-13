@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CNA Skills Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1d2421;--mute:#68716c;--line:#e2ded5;--acc:#1f6f5c;--acc2:#e7f2ee;--bad:#b3412f;--bad2:#fbeae6;--warn:#a0730d;--warn2:#fbf3dc;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141816;--card:#1d2321;--ink:#e9ece9;--mute:#9aa49f;--line:#2e3633;--acc:#5fc2a5;--acc2:#1e3530;--bad:#ef8b77;--bad2:#3a2420;--warn:#e3b54a;--warn2:#3a301a;}}
+:root[data-theme="dark"]{--bg:#141816;--card:#1d2321;--ink:#e9ece9;--mute:#9aa49f;--line:#2e3633;--acc:#5fc2a5;--acc2:#1e3530;--bad:#ef8b77;--bad2:#3a2420;--warn:#e3b54a;--warn2:#3a301a;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:24px 16px 60px}
+h1{font-family:Fraunces,serif;font-weight:600;font-size:28px;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 20px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit;font-weight:500}
+.tab.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+select,button.b{font:inherit;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}
+h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
+.hint{color:var(--mute);font-size:13px;margin:0 0 12px}
+.list{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.item{border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;background:var(--card);text-align:left;font:inherit;color:var(--ink);width:100%}
+.item:hover{border-color:var(--acc)}
+.item .n{min-width:24px;height:24px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:12px;font-weight:600;flex:none}
+.item.used{opacity:.35;pointer-events:none}
+.item.sel{background:var(--acc2);border-color:var(--acc)}
+.item.ok{background:var(--acc2);border-color:var(--acc)}
+.item.no{background:var(--bad2);border-color:var(--bad)}
+.item.miss{background:var(--warn2);border-color:var(--warn)}
+.tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--bad2);color:var(--bad);margin-left:6px;white-space:nowrap}
+.score{font-weight:600;margin:10px 0}
+.opt{margin:6px 0}
+.flash{min-height:120px}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0 14px}
+.prog i{display:block;height:100%;background:var(--acc)}
+.foot{color:var(--mute);font-size:12px;margin-top:24px}
+.foot a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>CNA Skills Practice</h1>
+<p class="sub">The 23 skills from the Credentia skills list. Critical steps are the ones you can't miss.</p>
+<div class="tabs" id="tabs"></div>
+<div class="card" id="app"></div>
+<p class="foot">Steps are paraphrased from <a href="https://kb-nc.credentia.com/en/article/skills">Credentia's skills page</a>. Check the official candidate handbook for your state before the exam. In California, manual BP (Skill 23) is tested, not electronic BP (Skill 12).</p>
+</div>
+<script>
+// [text, critical?]
+const S=[
+["Hand Hygiene",[["Greet the client by name and introduce yourself"],["Turn on the sink water"],["Wet hands and wrists"],["Apply soap"],["Lather all surfaces of wrists, hands and fingers for at least 20 seconds, hands below elbows, fingertips down",1],["Clean fingernails by rubbing fingertips against the opposite palm"],["Rinse all surfaces, hands below elbows, fingertips down",1],["Dry from fingertips toward wrists with a clean paper towel, then discard it"],["Turn off the faucet with a towel (or knee/foot control), then discard the towel"],["Never touch the inside of the sink"]]],
+["Apply One Knee-High Elastic Stocking",[["Explain the procedure, facing the client"],["Provide privacy"],["Client lies supine"],["Turn the stocking inside out to the heel"],["Place stocking foot over toes, foot and heel"],["Pull the top over foot, heel and leg"],["Move the leg gently, no force or overextension"],["No twists or wrinkles; heel and toe opening correctly placed",1],["Signaling device in reach, bed low"],["Wash hands"]]],
+["Assist to Ambulate Using Transfer Belt",[["Explain the procedure"],["Provide privacy"],["Client wears non-skid footwear before standing",1],["Bring bed to a safe height"],["Check/lock bed wheels"],["Assist client to sit with feet flat on the floor",1],["Apply transfer belt snugly at the waist over clothing"],["Give instructions and a prearranged signal"],["Stand facing client, count to three"],["On signal, assist to stand grasping belt on both sides, knee to knee or toe to toe"],["Walk slightly behind and to one side for 10 feet, holding the belt"],["Assist client back to bed and remove belt"],["Signaling device in reach, bed low"],["Wash hands"]]],
+["Assist With Use of Bedpan",[["Explain the procedure"],["Provide privacy"],["Lower the head of the bed"],["Put on clean gloves"],["Place bedpan correctly under the buttocks",1],["Remove gloves without contamination, wash hands"],["Raise head of bed after positioning"],["Toilet tissue in reach"],["Hand wipe in reach; instruct client to clean hands"],["Signaling device in reach; ask client to signal when done"],["Put on clean gloves before removing bedpan"],["Lower head of bed before removing bedpan"],["Keep client covered except during placement/removal"],["Empty and rinse bedpan, pour rinse into toilet"],["Place bedpan in dirty supply area"],["Remove gloves, wash hands"],["Signaling device in reach, bed low"]]],
+["Clean Upper or Lower Denture",[["Put on clean gloves"],["Line sink and/or partially fill with water"],["Rinse denture in moderate-temperature running water before brushing"],["Apply denture toothpaste to brush"],["Brush all denture surfaces"],["Rinse all surfaces in moderate-temperature water"],["Rinse denture cup and lid"],["Place denture in cup with water/solution and cover"],["Rinse toothbrush, place in designated container"],["Maintain clean technique with brush and denture"],["Remove sink liner and/or drain sink"],["Remove gloves, wash hands"]]],
+["Count and Record Radial Pulse",[["Explain the procedure"],["Place fingertips on thumb side of wrist to find radial pulse"],["Count beats for one full minute"],["Signaling device in reach"],["Wash hands before recording"],["Record rate within ±4 beats of evaluator",1]]],
+["Count and Record Respirations",[["Explain the procedure (for testing)"],["Count respirations for one full minute"],["Signaling device in reach"],["Wash hands before recording"],["Record rate within ±2 breaths of evaluator",1]]],
+["Donning and Removing PPE (Gown and Gloves)",[["Pick up gown and unfold it"],["Facing the back opening, put arms through sleeves"],["Fasten the neck opening"],["Secure gown at waist, covering as much of your back as possible"],["Put on gloves"],["Glove cuffs overlap gown cuffs"],["Before removing gown, grasp one glove at the palm with the other gloved hand and remove it",1],["Slip ungloved fingers under cuff of remaining glove and remove it inside out",1],["Dispose of gloves without self-contamination"],["Unfasten gown at waist and neck"],["Remove gown without touching its outside"],["Hold gown away from body, turn inside out, don't touch floor"],["Dispose of gown in designated container"],["Wash hands"]]],
+["Dress Client With Affected (Weak) Right Arm",[["Explain the procedure"],["Provide privacy"],["Ask which shirt the client prefers, dress them in it"],["Keep chest covered"],["Remove gown from left (unaffected) side first, then right"],["Put gown in soiled linen before dressing"],["Put affected right arm into right sleeve BEFORE the left arm",1],["Move gently, no force or overextension"],["Finish with clothing in place"],["Signaling device in reach, bed low"],["Wash hands"]]],
+["Feed Client Who Cannot Feed Self",[["Explain the procedure"],["Check name card on tray; ask client to state name"],["Client upright at 75–90° before feeding",1],["Place tray where client can see the food"],["Clean client's hands"],["Sit facing the client"],["Tell client what foods and drinks are on the tray"],["Ask what client wants to eat first"],["Offer one bite of each food with a spoon, naming each"],["Offer a beverage at least once"],["Ask if ready for next bite or sip"],["Clean client's mouth and hands at the end"],["Remove the tray"],["Leave client upright 75–90° with signaling device in reach"],["Wash hands"]]],
+["Modified Bed Bath (Face, One Arm, Hand, Underarm)",[["Explain the procedure"],["Provide privacy"],["Remove gown into soiled linen, keeping chest and lower body covered"],["Check water temperature; client verifies"],["Put on clean gloves"],["Wash eyes first with wet cloth (no soap), clean area each stroke, inner to outer; then wash face",1],["Dry the face"],["Expose one arm, towel under it"],["Apply soap to wet washcloth"],["Wash fingers (incl. nails), hand, arm and underarm; rest of body covered"],["Rinse and dry those areas"],["Move gently, no force or overextension"],["Put clean gown on client"],["Empty, rinse and dry basin"],["Basin to dirty supply area"],["Linen into soiled linen container"],["Keep your clothing off used linen"],["Remove gloves, wash hands"],["Signaling device in reach, bed low"]]],
+["Measure and Record Electronic Blood Pressure",[["Explain the procedure"],["Provide privacy"],["Client in comfortable lying or sitting position"],["Arm at heart level, palm up, upper arm exposed"],["Select correct cuff size"],["Locate brachial artery at inner elbow"],["Place cuff snugly, sensor/arrow over artery"],["Turn on machine, confirm it works, select adult/child setting"],["Press start; if cuff inflates above 200 mm Hg, stop and use other arm"],["Wait for reading and full deflation, remove cuff"],["Signaling device in reach"],["Wash hands before recording"],["Record systolic and diastolic exactly as on screen",1]]],
+["Measure and Record Urinary Output",[["Put on clean gloves before handling bedpan"],["Pour contents into measuring container without spilling"],["Rinse bedpan, pour rinse into toilet"],["Measure at eye level on flat surface; round up to nearest 25 mL"],["Empty measuring container into toilet"],["Rinse container, pour rinse into toilet"],["Remove gloves and wash hands before recording"],["Record amount within ±25 mL of evaluator",1]]],
+["Measure and Record Weight of Ambulatory Client",[["Explain the procedure"],["Non-skid footwear on before walking to scale"],["Set scale to zero before client steps on"],["Client steps onto center of scale; obtain weight"],["Client steps off"],["Wash hands before recording"],["Record weight within ±2 lbs (±0.9 kg) of evaluator",1]]],
+["Modified PROM: One Knee and One Ankle",[["Explain the procedure"],["Provide privacy"],["Client supine; ask them to tell you if they feel pain"],["Support leg at knee and ankle; bend knee and return, at least 3 times, stop if pain",1],["Support foot near bed; dorsiflex and plantar flex, at least 3 times, stop if pain",1],["Signaling device in reach, bed low"],["Wash hands"]]],
+["Modified PROM: One Shoulder",[["Explain the procedure"],["Provide privacy"],["Ask client to tell you if they feel pain"],["Support at elbow and wrist; raise straight arm toward ear and back (flexion/extension), at least 3 times, stop if pain",1],["Support at elbow and wrist; move arm out to shoulder level and back (abduction/adduction), at least 3 times, stop if pain",1],["Signaling device in reach, bed low"],["Wash hands"]]],
+["Position On Side",[["Explain the procedure"],["Provide privacy"],["Lower the head of the bed"],["Raise side rail on the side client turns toward"],["Help client slowly roll toward raised rail"],["Place/adjust pillow under head"],["Reposition arm and shoulder so client isn't lying on arm"],["Support top arm with a device"],["Support behind client's back"],["Support between legs, top knee flexed, knee and ankle supported"],["Signaling device in reach, bed low"],["Wash hands"]]],
+["Catheter Care for Female",[["Explain the procedure"],["Provide privacy"],["Check water temperature; client verifies"],["Put on clean gloves"],["Linen protector under perineal area incl. buttocks"],["Expose only area between hip and knee"],["Apply soap to washcloth"],["Holding catheter at meatus without tugging, clean at least 4 inches away from meatus, one direction, clean area each stroke",1],["Holding catheter the same way, rinse at least 4 inches, one direction, clean area each stroke",1],["Dry at least 4 inches away from meatus"],["Empty, rinse and dry basin"],["Basin to dirty supply area"],["Dispose of linen and protector"],["Keep your clothing off used linen"],["Remove gloves, wash hands"],["Signaling device in reach, bed low"]]],
+["Foot Care on One Foot",[["Explain the procedure"],["Provide privacy"],["Check water temperature; client verifies"],["Basin positioned comfortably on protective barrier"],["Put on clean gloves"],["Place bare foot in water"],["Apply soap to washcloth"],["Lift foot and wash, including between toes"],["Rinse, including between toes"],["Dry, including between toes"],["Lotion top and bottom of foot (not between toes), remove excess"],["Support foot and ankle throughout"],["Empty, rinse and dry basin"],["Basin to dirty supply area"],["Linen to soiled container"],["Remove gloves, wash hands"],["Signaling device in reach"]]],
+["Mouth Care",[["Explain the procedure"],["Provide privacy"],["Client upright at 75–90° before mouth care",1],["Put on clean gloves"],["Towel across client's chest"],["Get cup of water, moisten toothbrush"],["Apply toothpaste to moistened brush"],["Clean mouth incl. tongue and all tooth surfaces, gentle motions",1],["Maintain clean technique with toothbrush"],["Hold emesis basin at chin while client rinses"],["Wipe mouth, remove clothing protector"],["Linen to soiled container"],["Rinse toothbrush; empty, rinse, dry basin"],["Remove gloves, wash hands"],["Signaling device in reach, bed low"]]],
+["Perineal Care for Female",[["Explain the procedure"],["Provide privacy"],["Check water temperature; client verifies"],["Put on clean gloves"],["Pad/protector under perineal area incl. buttocks"],["Expose only area between hips and knees"],["Apply soap to washcloth"],["Wash genital area front to back, clean area each stroke",1],["Rinse genital area front to back, clean area each stroke",1],["Dry genital area front to back"],["Turn client; wash rectal area front to back, clean area each stroke"],["Rinse rectal area front to back"],["Dry rectal area front to back"],["Reposition client"],["Empty, rinse and dry basin"],["Basin to dirty supply area"],["Dispose of linen and protector"],["Keep your clothing off used linen"],["Remove gloves, wash hands"],["Signaling device in reach, bed low"]]],
+["Transfer Bed to Wheelchair Using Transfer Belt",[["Explain the procedure"],["Provide privacy"],["Wheelchair alongside bed at head or foot, facing correctly"],["Fold up or remove footrests"],["Lock wheelchair wheels",1],["Bring bed to a safe height"],["Check/lock bed wheels"],["Assist client to sit with feet flat on floor",1],["Confirm client is wearing shoes"],["Apply transfer belt snugly at waist over clothing"],["Give instructions and prearranged signal"],["Stand facing client, count to three"],["On signal, assist to stand grasping belt both sides, knee to knee or toe to toe"],["Help client turn so backs of legs touch wheelchair"],["Lower client into wheelchair"],["Hips against back of chair; remove belt"],["Feet on footrests"],["Signaling device in reach"],["Wash hands"]]],
+["Measure and Record Manual Blood Pressure",[["Explain the procedure"],["Wipe stethoscope bell/diaphragm and earpieces with alcohol"],["Arm palm up, upper arm exposed"],["Locate brachial artery at inner elbow"],["Place cuff snugly, sensor/arrow over artery"],["Earpieces in, bell/diaphragm over artery"],["Inflate to 160–180 mm Hg; if beat heard right away, deflate fully and re-inflate to no more than 200"],["Deflate slowly; first sound = systolic, last = diastolic; round up to nearest 2"],["Remove cuff"],["Signaling device in reach"],["Wash hands before recording"],["Record systolic and diastolic each within ±8 mm Hg of evaluator",1]]]
+];
+const FACTS=[
+["How long must you lather during hand hygiene?","At least 20 seconds",["At least 10 seconds","At least 30 seconds","At least 60 seconds"]],
+["During hand washing, hands are held…","Below elbows, fingertips down",["Above elbows, fingertips up","Level with elbows","Whatever is comfortable"]],
+["How do you turn off the faucet after hand washing?","With a paper towel or knee/foot control",["With your clean hand","With your elbow","Leave it running for the next person"]],
+["Radial pulse: how long do you count?","One full minute",["30 seconds ×2","15 seconds ×4","10 seconds ×6"]],
+["Pulse must be within how many beats of the evaluator?","±4 beats",["±2 beats","±6 beats","±8 beats"]],
+["Respirations must be within how many breaths of the evaluator?","±2 breaths",["±4 breaths","±1 breath","±5 breaths"]],
+["Urinary output must be within what range of the evaluator?","±25 mL",["±10 mL","±50 mL","±5 mL"]],
+["When the urine level is between lines, you…","Round up to the nearest 25 mL",["Round down","Round to the nearest 50 mL","Estimate to the exact mL"]],
+["Weight must be within what range of the evaluator?","±2 lbs (±0.9 kg)",["±1 lb","±5 lbs","±0.5 kg"]],
+["Manual BP must be within what range of the evaluator?","±8 mm Hg",["±4 mm Hg","±10 mm Hg","±2 mm Hg"]],
+["Manual BP: inflate the cuff to…","160–180 mm Hg",["120–140 mm Hg","200–220 mm Hg","Until the needle stops"]],
+["Manual BP: if a beat is heard right away on deflation, re-inflate to no more than…","200 mm Hg",["180 mm Hg","220 mm Hg","250 mm Hg"]],
+["Manual BP readings are rounded…","Up to the nearest 2 mm Hg",["Down to the nearest 2","To the nearest 5","To the nearest 10"]],
+["Before feeding or mouth care, the client sits at…","75–90 degrees",["30–45 degrees","45–60 degrees","Flat"]],
+["Ambulating with a transfer belt: how far do you walk?","10 feet",["5 feet","20 feet","Across the room and back"]],
+["When ambulating, you walk…","Slightly behind and to one side",["Directly in front","Directly beside, arm linked","Directly behind"]],
+["PROM movements are done at least…","3 times each, unless pain is reported",["5 times each","10 times each","Once each"]],
+["Dressing a client with a weak right arm: which sleeve goes on first?","The weak (right) arm",["The strong (left) arm","Either, as long as it's gentle","Both at the same time"]],
+["Undressing a client with a weak right arm: which side comes off first?","The left (unaffected) side",["The right (affected) side","Either","Cut the gown off"]],
+["Catheter care: clean at least how far from the meatus?","4 inches",["2 inches","6 inches","1 inch"]],
+["Peri-care: which direction do you wash?","Front to back",["Back to front","Circular motions","Either, with a clean cloth"]],
+["Bed bath: how do you wash the eyes?","Water only, inner to outer, clean area each stroke",["Soap and water, outer to inner","Water only, outer to inner","Mild soap, inner to outer"]],
+["Foot care: where do you NOT put lotion?","Between the toes",["On the heel","On the top of the foot","On the sole"]],
+["Position on side: which side rail do you raise?","The side the client turns toward",["The side you stand on","Both rails","Neither"]],
+["Elastic stocking: how is the stocking prepared?","Turned inside out to the heel",["Rolled up from the top","Turned fully inside out","Folded in half"]],
+["Removing PPE: what comes off first?","Gloves",["Gown","Gown and gloves together","Whichever is dirtiest"]],
+["Electronic BP: if the cuff inflates above 200 mm Hg you…","Stop and use the other arm",["Let it finish","Restart on the same arm","Switch to a manual cuff"]],
+["Wheelchair transfer: what's the critical step before standing the client?","Lock the wheelchair wheels",["Remove the armrests","Put on gloves","Raise the bed to its highest"]],
+["Weighing a client: before they step on, you…","Set the scale to zero",["Have them remove shoes","Record their last weight","Lock the scale"]],
+["When do you wash hands in the vital-sign skills?","Before recording the result",["After recording","Only before starting","Not required"]]
+];
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const app=document.getElementById('app');
+const MODES=[["order","Put steps in order"],["crit","Spot critical steps"],["flash","Recall flashcards"],["quiz","Quick quiz"]];
+let mode="order",skill=0;
+const tabs=document.getElementById('tabs');
+MODES.forEach(([k,l])=>{const b=document.createElement('button');b.className='tab';b.textContent=l;b.onclick=()=>{mode=k;render()};b.dataset.k=k;tabs.appendChild(b)});
+function picker(){return `<div class="row"><select id="sk">${S.map((s,i)=>`<option value="${i}" ${i==skill?'selected':''}>${i+1}. ${esc(s[0])}</option>`).join('')}</select><button class="b" id="rnd">Random skill</button></div>`}
+function bindPicker(){document.getElementById('sk').onchange=e=>{skill=+e.target.value;render()};document.getElementById('rnd').onclick=()=>{skill=Math.random()*S.length|0;render()}}
+function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({order,crit,flash,quiz})[mode]()}
+
+function order(){
+  const steps=S[skill][1];const idx=shuf(steps.map((_,i)=>i));let picked=[];
+  app.innerHTML=picker()+`<h2>${esc(S[skill][0])}</h2><p class="hint">Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button></div>`;
+  bindPicker();
+  const pool=document.getElementById('pool'),out=document.getElementById('out');
+  function draw(){
+    pool.innerHTML=idx.map(i=>`<button class="item ${picked.includes(i)?'used':''}" data-i="${i}"><span class="n">${picked.includes(i)?picked.indexOf(i)+1:'·'}</span><span>${esc(steps[i][0])}</span></button>`).join('');
+    pool.querySelectorAll('.item').forEach(b=>b.onclick=()=>{picked.push(+b.dataset.i);if(picked.length==steps.length)check();else draw()});
+    out.innerHTML=picked.length?`<p class="hint">Your order so far: ${picked.length}/${steps.length}</p>`:'';
+  }
+  function check(){
+    let right=0;
+    pool.innerHTML=picked.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n">${pos+1}</span><span>${esc(steps[i][0])}${steps[i][1]?'<span class="tag">critical</span>':''}${ok?'':`<br><small style="color:var(--mute)">Should be step ${i+1}</small>`}</span></div>`}).join('');
+    out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol>${steps.map(s=>`<li>${esc(s[0])}${s[1]?'<span class="tag">critical</span>':''}</li>`).join('')}</ol></details>`;
+  }
+  document.getElementById('undo').onclick=()=>{picked.pop();draw()};
+  document.getElementById('again').onclick=order;
+  draw();
+}
+
+function crit(){
+  const steps=S[skill][1];let sel=new Set();
+  app.innerHTML=picker()+`<h2>${esc(S[skill][0])}</h2><p class="hint">Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check</button></div>`;
+  bindPicker();
+  const l=document.getElementById('l');
+  l.innerHTML=steps.map((s,i)=>`<button class="item" data-i="${i}"><span class="n">${i+1}</span><span>${esc(s[0])}</span></button>`).join('');
+  l.querySelectorAll('.item').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel')});
+  document.getElementById('chk').onclick=()=>{
+    let hit=0,miss=0,fp=0;
+    l.querySelectorAll('.item').forEach(b=>{const i=+b.dataset.i,c=!!steps[i][1],s=sel.has(i);b.classList.remove('sel');b.style.pointerEvents='none';
+      if(c&&s){b.classList.add('ok');hit++}else if(c){b.classList.add('miss');miss++}else if(s){b.classList.add('no');fp++}
+      if(c)b.querySelector('span:last-child').insertAdjacentHTML('beforeend','<span class="tag">critical</span>')});
+    document.getElementById('out').innerHTML=`<p class="score">${hit} found · ${miss} missed · ${fp} wrongly marked</p><p class="hint">Green = got it, yellow = missed critical step, red = not critical.</p>`;
+    document.getElementById('chk').textContent='Try another';document.getElementById('chk').onclick=()=>{skill=Math.random()*S.length|0;crit()};
+  };
+}
+
+function flash(){
+  const steps=S[skill][1];let shown=0;
+  app.innerHTML=picker()+`<h2>${esc(S[skill][0])}</h2><p class="hint">Say each step out loud, then reveal it to check yourself.</p><div class="prog"><i id="pg" style="width:0"></i></div><div class="list flash" id="l"></div><div class="row"><button class="b p" id="nx">Reveal next step</button><button class="b" id="all">Show all</button><button class="b" id="new">Next skill</button></div>`;
+  bindPicker();
+  const l=document.getElementById('l');
+  function draw(){l.innerHTML=steps.slice(0,shown).map((s,i)=>`<div class="item"><span class="n">${i+1}</span><span>${esc(s[0])}${s[1]?'<span class="tag">critical</span>':''}</span></div>`).join('')||'<p class="hint">What\'s step 1?</p>';document.getElementById('pg').style.width=(shown/steps.length*100)+'%';const nx=document.getElementById('nx');nx.disabled=shown>=steps.length;nx.textContent=shown>=steps.length?'Done':`Reveal step ${shown+1}`}
+  document.getElementById('nx').onclick=()=>{shown++;draw()};
+  document.getElementById('all').onclick=()=>{shown=steps.length;draw()};
+  document.getElementById('new').onclick=()=>{skill=(skill+1)%S.length;flash()};
+  draw();
+}
+
+function makeQ(){
+  if(Math.random()<.5){const f=FACTS[Math.random()*FACTS.length|0];return {q:f[0],a:f[1],opts:shuf([f[1],...f[2]])}}
+  const si=Math.random()*S.length|0,st=S[si][1];
+  if(Math.random()<.5){
+    const crits=st.filter(s=>s[1]),non=st.filter(s=>!s[1]);
+    const c=crits[Math.random()*crits.length|0][0];
+    return {q:`${S[si][0]}: which of these is a critical element step?`,a:c,opts:shuf([c,...shuf(non).slice(0,3).map(s=>s[0])])};
+  }
+  const i=Math.random()*(st.length-1)|0,a=st[i+1][0];
+  const others=shuf(st.filter((_,k)=>k!=i+1&&k!=i)).slice(0,3).map(s=>s[0]);
+  return {q:`${S[si][0]}: what comes right after "${st[i][0]}"?`,a,opts:shuf([a,...others])};
+}
+let qs={n:0,r:0};
+function quiz(){
+  const Q=makeQ();
+  app.innerHTML=`<p class="hint">Score: ${qs.r}/${qs.n}${qs.n?` (${Math.round(qs.r/qs.n*100)}%)`:''} · <a href="#" id="rs" style="color:var(--acc)">reset</a></p><h2>${esc(Q.q)}</h2><div class="list" id="l"></div><div class="row"><button class="b p" id="nx" style="display:none">Next question</button></div>`;
+  const l=document.getElementById('l');
+  l.innerHTML=Q.opts.map(o=>`<button class="item opt"><span>${esc(o)}</span></button>`).join('');
+  [...l.children].forEach((b,k)=>b.onclick=()=>{
+    const ok=Q.opts[k]==Q.a;qs.n++;if(ok)qs.r++;
+    [...l.children].forEach((c,j)=>{c.style.pointerEvents='none';if(Q.opts[j]==Q.a)c.classList.add('ok');else if(j==k)c.classList.add('no')});
+    document.getElementById('nx').style.display='';
+  });
+  document.getElementById('nx').onclick=quiz;
+  document.getElementById('rs').onclick=e=>{e.preventDefault();qs={n:0,r:0};quiz()};
+}
+render();
+</script>
+</body>
+</html>
