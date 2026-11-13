@@ -113,18 +113,22 @@ const FACTS=[
 const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const app=document.getElementById('app');
-const MODES=[["order","Put steps in order"],["crit","Spot critical steps"],["flash","Recall flashcards"],["quiz","Quick quiz"]];
-let mode="order",skill=0;
+const MODES=[["drill","Step practice"],["flash","Recall flashcards"],["quiz","Quick quiz"]];
+let mode="drill",skill=-1;
 const tabs=document.getElementById('tabs');
 MODES.forEach(([k,l])=>{const b=document.createElement('button');b.className='tab';b.textContent=l;b.onclick=()=>{mode=k;render()};b.dataset.k=k;tabs.appendChild(b)});
-function picker(){return `<div class="row"><select id="sk">${S.map((s,i)=>`<option value="${i}" ${i==skill?'selected':''}>${i+1}. ${esc(s[0])}</option>`).join('')}</select><button class="b" id="rnd">Random skill</button></div>`}
-function bindPicker(){document.getElementById('sk').onchange=e=>{skill=+e.target.value;render()};document.getElementById('rnd').onclick=()=>{skill=Math.random()*S.length|0;render()}}
-function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({order,crit,flash,quiz})[mode]()}
+// draw a random skill, never the same one twice running
+function nextSkill(){const p=skill;do{skill=Math.random()*S.length|0}while(S.length>1&&skill==p)}
+// step practice: random skill, then randomly either ordering or critical steps.
+// Skills with no critical steps flagged always get the ordering task, so a round
+// is never unanswerable.
+function drill(){nextSkill();(S[skill][1].some(s=>s[1])&&Math.random()<.5?crit:order)()}
+function flashNew(){nextSkill();flash()}
+function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,flash:flashNew,quiz})[mode]()}
 
 function order(){
   const steps=S[skill][1];const idx=shuf(steps.map((_,i)=>i));let picked=[];
-  app.innerHTML=picker()+`<h2>${esc(S[skill][0])}</h2><p class="hint">Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button></div>`;
-  bindPicker();
+  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button><button class="b p" id="new">Next skill</button></div>`;
   const pool=document.getElementById('pool'),out=document.getElementById('out');
   function draw(){
     pool.innerHTML=idx.map(i=>`<button class="item ${picked.includes(i)?'used':''}" data-i="${i}"><span class="n">${picked.includes(i)?picked.indexOf(i)+1:'·'}</span><span>${esc(steps[i][0])}</span></button>`).join('');
@@ -138,13 +142,13 @@ function order(){
   }
   document.getElementById('undo').onclick=()=>{picked.pop();draw()};
   document.getElementById('again').onclick=order;
+  document.getElementById('new').onclick=drill;
   draw();
 }
 
 function crit(){
   const steps=S[skill][1];let sel=new Set();
-  app.innerHTML=picker()+`<h2>${esc(S[skill][0])}</h2><p class="hint">Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check</button></div>`;
-  bindPicker();
+  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check</button></div>`;
   const l=document.getElementById('l');
   l.innerHTML=steps.map((s,i)=>`<button class="item" data-i="${i}"><span class="n">${i+1}</span><span>${esc(s[0])}</span></button>`).join('');
   l.querySelectorAll('.item').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel')});
@@ -154,19 +158,18 @@ function crit(){
       if(c&&s){b.classList.add('ok');hit++}else if(c){b.classList.add('miss');miss++}else if(s){b.classList.add('no');fp++}
       if(c)b.querySelector('span:last-child').insertAdjacentHTML('beforeend','<span class="tag">critical</span>')});
     document.getElementById('out').innerHTML=`<p class="score">${hit} found · ${miss} missed · ${fp} wrongly marked</p><p class="hint">Green = got it, yellow = missed critical step, red = not critical.</p>`;
-    document.getElementById('chk').textContent='Try another';document.getElementById('chk').onclick=()=>{skill=Math.random()*S.length|0;crit()};
+    document.getElementById('chk').textContent='Try another';document.getElementById('chk').onclick=drill;
   };
 }
 
 function flash(){
   const steps=S[skill][1];let shown=0;
-  app.innerHTML=picker()+`<h2>${esc(S[skill][0])}</h2><p class="hint">Say each step out loud, then reveal it to check yourself.</p><div class="prog"><i id="pg" style="width:0"></i></div><div class="list flash" id="l"></div><div class="row"><button class="b p" id="nx">Reveal next step</button><button class="b" id="all">Show all</button><button class="b" id="new">Next skill</button></div>`;
-  bindPicker();
+  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Say each step out loud, then reveal it to check yourself.</p><div class="prog"><i id="pg" style="width:0"></i></div><div class="list flash" id="l"></div><div class="row"><button class="b p" id="nx">Reveal next step</button><button class="b" id="all">Show all</button><button class="b" id="new">Next skill</button></div>`;
   const l=document.getElementById('l');
   function draw(){l.innerHTML=steps.slice(0,shown).map((s,i)=>`<div class="item"><span class="n">${i+1}</span><span>${esc(s[0])}${s[1]?'<span class="tag">critical</span>':''}</span></div>`).join('')||'<p class="hint">What\'s step 1?</p>';document.getElementById('pg').style.width=(shown/steps.length*100)+'%';const nx=document.getElementById('nx');nx.disabled=shown>=steps.length;nx.textContent=shown>=steps.length?'Done':`Reveal step ${shown+1}`}
   document.getElementById('nx').onclick=()=>{shown++;draw()};
   document.getElementById('all').onclick=()=>{shown=steps.length;draw()};
-  document.getElementById('new').onclick=()=>{skill=(skill+1)%S.length;flash()};
+  document.getElementById('new').onclick=flashNew;
   draw();
 }
 
