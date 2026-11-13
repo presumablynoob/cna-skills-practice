@@ -33,6 +33,8 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .item.ok{background:var(--acc2);border-color:var(--acc)}
 .item.no{background:var(--bad2);border-color:var(--bad)}
 .item.miss{background:var(--warn2);border-color:var(--warn)}
+.qtype+h2{margin-top:0}
+.qtype{display:inline-block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--acc);background:var(--acc2);border:1px solid var(--acc);padding:3px 11px;border-radius:999px;margin:0 0 10px}
 .tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--bad2);color:var(--bad);margin-left:6px;white-space:nowrap}
 .score{font-weight:600;margin:10px 0}
 .opt{margin:6px 0}
@@ -128,7 +130,7 @@ function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.datase
 
 function order(){
   const steps=S[skill][1];const idx=shuf(steps.map((_,i)=>i));let picked=[];
-  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button><button class="b p" id="new">Next skill</button></div>`;
+  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button><button class="b p" id="new">Next skill</button></div>`;
   const pool=document.getElementById('pool'),out=document.getElementById('out');
   function draw(){
     pool.innerHTML=idx.map(i=>`<button class="item ${picked.includes(i)?'used':''}" data-i="${i}"><span class="n">${picked.includes(i)?picked.indexOf(i)+1:'·'}</span><span>${esc(steps[i][0])}</span></button>`).join('');
@@ -148,7 +150,7 @@ function order(){
 
 function crit(){
   const steps=S[skill][1];let sel=new Set();
-  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check</button></div>`;
+  app.innerHTML=`<p class="qtype">Critical Steps</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check</button></div>`;
   const l=document.getElementById('l');
   l.innerHTML=steps.map((s,i)=>`<button class="item" data-i="${i}"><span class="n">${i+1}</span><span>${esc(s[0])}</span></button>`).join('');
   l.querySelectorAll('.item').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel')});
