@@ -28,7 +28,13 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .item{border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;background:var(--card);text-align:left;font:inherit;color:var(--ink);width:100%}
 .item:hover{border-color:var(--acc)}
 .item .n{min-width:24px;height:24px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:12px;font-weight:600;flex:none}
-.item.used{opacity:.35;pointer-events:none}
+.item.drag{cursor:default;touch-action:pan-y}
+.item.dragging{border-color:var(--acc);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.grip{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative}
+/* invisible 44x44 touch target around the 24px handle */
+.grip::after{content:"";position:absolute;inset:-10px}
+.grip:active{cursor:grabbing}
+.grip:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .item.sel{background:var(--acc2);border-color:var(--acc)}
 .item.ok{background:var(--acc2);border-color:var(--acc)}
 .item.no{background:var(--bad2);border-color:var(--bad)}
@@ -102,20 +108,62 @@ function drill(){nextSkill();(S[skill][1].some(s=>s[1])&&Math.random()<.5?crit:o
 function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,review})[mode]()}
 
 function order(){
-  const steps=S[skill][1];const idx=shuf(steps.map((_,i)=>i));let picked=[];
-  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button><button class="b p" id="new">Next skill</button></div>`;
+  const steps=S[skill][1];
+  // cur[position] = index of the step currently sitting there
+  let cur=shuf(steps.map((_,i)=>i));
+  if(steps.length>1&&cur.every((v,i)=>v===i))cur=shuf(cur);
+  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Drag the numbered handles to put the steps in the order you would do them, then check. Arrow keys work too.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check order</button><button class="b" id="again">Reshuffle</button><button class="b" id="new">Next skill</button></div>`;
   const pool=document.getElementById('pool'),out=document.getElementById('out');
+  const renumber=()=>[...pool.children].forEach((c,k)=>c.querySelector('.n').textContent=k+1);
+  const sync=()=>{cur=[...pool.children].map(c=>+c.dataset.i)};
+  // move the dragged row so its centre lands between its neighbours
+  function place(item,y){
+    const others=[...pool.children].filter(c=>c!==item);
+    const before=others.find(c=>{const r=c.getBoundingClientRect();return y<r.top+r.height/2});
+    if(before)pool.insertBefore(item,before);else pool.appendChild(item);
+    renumber();
+  }
+  function bind(){
+    pool.querySelectorAll('.grip').forEach(h=>{
+      h.onpointerdown=e=>{
+        e.preventDefault();
+        const item=h.parentElement;
+        item.classList.add('dragging');
+        try{h.setPointerCapture(e.pointerId)}catch(_){}
+        const move=ev=>place(item,ev.clientY);
+        // listen on the window and on capture loss too, so the row never
+        // stays stuck in drag state if a pointerup goes missing
+        const end=()=>{
+          item.classList.remove('dragging');
+          removeEventListener('pointermove',move);
+          removeEventListener('pointerup',end);
+          removeEventListener('pointercancel',end);
+          h.removeEventListener('lostpointercapture',end);
+          sync();
+        };
+        addEventListener('pointermove',move);
+        addEventListener('pointerup',end);
+        addEventListener('pointercancel',end);
+        h.addEventListener('lostpointercapture',end);
+      };
+      h.onkeydown=e=>{
+        const item=h.parentElement,prev=item.previousElementSibling,next=item.nextElementSibling;
+        if(e.key==='ArrowUp'&&prev){e.preventDefault();pool.insertBefore(item,prev);renumber();sync();h.focus()}
+        else if(e.key==='ArrowDown'&&next){e.preventDefault();pool.insertBefore(next,item);renumber();sync();h.focus()}
+      };
+    });
+  }
   function draw(){
-    pool.innerHTML=idx.map(i=>`<button class="item ${picked.includes(i)?'used':''}" data-i="${i}"><span class="n">${picked.includes(i)?picked.indexOf(i)+1:'·'}</span><span>${esc(steps[i][0])}</span></button>`).join('');
-    pool.querySelectorAll('.item').forEach(b=>b.onclick=()=>{picked.push(+b.dataset.i);if(picked.length==steps.length)check();else draw()});
-    out.innerHTML=picked.length?`<p class="hint">Your order so far: ${picked.length}/${steps.length}</p>`:'';
+    pool.innerHTML=cur.map((i,pos)=>`<div class="item drag" data-i="${i}"><span class="n grip" tabindex="0" role="button" aria-label="Reorder step">${pos+1}</span><span>${esc(steps[i][0])}</span></div>`).join('');
+    bind();
   }
   function check(){
     let right=0;
-    pool.innerHTML=picked.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n">${pos+1}</span><span>${steps[i][1]?`<strong>${esc(steps[i][0])}</strong><span class="tag">critical</span>`:esc(steps[i][0])}${ok?'':`<br><small style="color:var(--mute)">Should be step ${i+1}</small>`}</span></div>`}).join('');
+    pool.innerHTML=cur.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n">${pos+1}</span><span>${steps[i][1]?`<strong>${esc(steps[i][0])}</strong><span class="tag">critical</span>`:esc(steps[i][0])}${ok?'':`<br><small style="color:var(--mute)">Should be step ${i+1}</small>`}</span></div>`}).join('');
     out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol>${steps.map(s=>`<li>${s[1]?`<strong>${esc(s[0])}</strong><span class="tag">critical</span>`:esc(s[0])}</li>`).join('')}</ol></details>`;
+    const c=document.getElementById('chk');c.textContent='Next skill';c.onclick=drill;
   }
-  document.getElementById('undo').onclick=()=>{picked.pop();draw()};
+  document.getElementById('chk').onclick=check;
   document.getElementById('again').onclick=order;
   document.getElementById('new').onclick=drill;
   draw();
