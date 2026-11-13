@@ -36,7 +36,6 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 /* invisible 44x44 touch target around the 24px handle */
 .grip::after{content:"";position:absolute;inset:-10px}
 .grip:active{cursor:grabbing}
-.grip:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .item.sel{background:var(--acc2);border-color:var(--acc)}
 .item.ok{background:var(--acc2);border-color:var(--acc)}
 .item.no{background:var(--bad2);border-color:var(--bad)}
@@ -115,7 +114,7 @@ function order(){
   // cur[position] = index of the step currently sitting there
   let cur=shuf(steps.map((_,i)=>i));
   if(steps.length>1&&cur.every((v,i)=>v===i))cur=shuf(cur);
-  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Drag the steps into the order you would do them, then submit. Arrow keys work too.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="again">Reshuffle</button><button class="b" id="new">Next</button></div>`;
+  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Drag the steps into the order you would do them, then submit.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="again">Reshuffle</button><button class="b" id="new">Next</button></div>`;
   const pool=document.getElementById('pool'),out=document.getElementById('out');
   const renumber=()=>[...pool.children].forEach((c,k)=>c.querySelector('.n').textContent=k+1);
   const sync=()=>{cur=[...pool.children].map(c=>+c.dataset.i)};
@@ -164,15 +163,10 @@ function order(){
           begin(item);
         }
       };
-      item.querySelector('.grip').onkeydown=e=>{
-        const h=e.currentTarget,prev=item.previousElementSibling,next=item.nextElementSibling;
-        if(e.key==='ArrowUp'&&prev){e.preventDefault();pool.insertBefore(item,prev);renumber();sync();h.focus()}
-        else if(e.key==='ArrowDown'&&next){e.preventDefault();pool.insertBefore(next,item);renumber();sync();h.focus()}
-      };
     });
   }
   function draw(){
-    pool.innerHTML=cur.map((i,pos)=>`<div class="item drag" data-i="${i}"><span class="n grip" tabindex="0" role="button" aria-label="Reorder step">${pos+1}</span><span>${esc(steps[i][0])}</span></div>`).join('');
+    pool.innerHTML=cur.map((i,pos)=>`<div class="item drag" data-i="${i}"><span class="n grip">${pos+1}</span><span>${esc(steps[i][0])}</span></div>`).join('');
     bind();
   }
   function check(){

@@ -7,10 +7,10 @@ A single-page practice tool for the 23 nurse aide skills on the Credentia skills
 - **Practice Exam**: draws a skill at random, then at random either puts its steps back in
   sequence or asks you to mark its critical element steps (missing one fails the skill).
   Each round is labelled "Determine Order" or "Critical Steps" above the skill name. There
-  is no skill picker. Ordering rounds are reordered by dragging a step anywhere on its row,
-  or by focusing its handle and using the up/down arrow keys; press Submit to grade, then
-  Next for another round. On a touch screen a swipe still scrolls the list: dragging a row
-  starts after a short hold, or immediately from the numbered handle.
+  is no skill picker. Ordering rounds are reordered by dragging a step anywhere on its row;
+  press Submit to grade, then Next for another round. On a touch screen a swipe still
+  scrolls the list: dragging a row starts after a short hold, or immediately from the
+  numbered handle.
 - **Skills**: every skill and every step in order, critical steps bold and tagged, as
   collapsible sections. For looking something up rather than being tested on it.
 
