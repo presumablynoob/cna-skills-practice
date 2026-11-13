@@ -41,6 +41,15 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .flash{min-height:120px}
 .prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0 14px}
 .prog i{display:block;height:100%;background:var(--acc)}
+.rev{border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--card)}
+.rev summary{padding:10px 12px;cursor:pointer;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;list-style:none}
+.rev summary::-webkit-details-marker{display:none}
+.rev summary::before{content:"▸";color:var(--mute);flex:none}
+.rev[open] summary::before{content:"▾"}
+.rev[open] summary{border-bottom:1px solid var(--line)}
+.cnt{color:var(--mute);font-size:12px}
+.revl{margin:10px 0;padding-left:32px}
+.revl li{margin:5px 0}
 .foot{color:var(--mute);font-size:12px;margin-top:24px}
 .foot a{color:var(--acc)}
 </style>
@@ -80,42 +89,10 @@ const S=[
 ["Transfer Bed to Wheelchair Using Transfer Belt",[["Explain the procedure"],["Provide privacy"],["Wheelchair alongside bed at head or foot, facing correctly"],["Fold up or remove footrests"],["Lock wheelchair wheels",1],["Bring bed to a safe height"],["Check/lock bed wheels"],["Assist client to sit with feet flat on floor",1],["Confirm client is wearing shoes"],["Apply transfer belt snugly at waist over clothing"],["Give instructions and prearranged signal"],["Stand facing client, count to three"],["On signal, assist to stand grasping belt both sides, knee to knee or toe to toe"],["Help client turn so backs of legs touch wheelchair"],["Lower client into wheelchair"],["Hips against back of chair; remove belt"],["Feet on footrests"],["Signaling device in reach"],["Wash hands"]]],
 ["Measure and Record Manual Blood Pressure",[["Explain the procedure"],["Wipe stethoscope bell/diaphragm and earpieces with alcohol"],["Arm palm up, upper arm exposed"],["Locate brachial artery at inner elbow"],["Place cuff snugly, sensor/arrow over artery"],["Earpieces in, bell/diaphragm over artery"],["Inflate to 160–180 mm Hg; if beat heard right away, deflate fully and re-inflate to no more than 200"],["Deflate slowly; first sound = systolic, last = diastolic; round up to nearest 2"],["Remove cuff"],["Signaling device in reach"],["Wash hands before recording"],["Record systolic and diastolic each within ±8 mm Hg of evaluator",1]]]
 ];
-const FACTS=[
-["How long must you lather during hand hygiene?","At least 20 seconds",["At least 10 seconds","At least 30 seconds","At least 60 seconds"]],
-["During hand washing, hands are held…","Below elbows, fingertips down",["Above elbows, fingertips up","Level with elbows","Whatever is comfortable"]],
-["How do you turn off the faucet after hand washing?","With a paper towel or knee/foot control",["With your clean hand","With your elbow","Leave it running for the next person"]],
-["Radial pulse: how long do you count?","One full minute",["30 seconds ×2","15 seconds ×4","10 seconds ×6"]],
-["Pulse must be within how many beats of the evaluator?","±4 beats",["±2 beats","±6 beats","±8 beats"]],
-["Respirations must be within how many breaths of the evaluator?","±2 breaths",["±4 breaths","±1 breath","±5 breaths"]],
-["Urinary output must be within what range of the evaluator?","±25 mL",["±10 mL","±50 mL","±5 mL"]],
-["When the urine level is between lines, you…","Round up to the nearest 25 mL",["Round down","Round to the nearest 50 mL","Estimate to the exact mL"]],
-["Weight must be within what range of the evaluator?","±2 lbs (±0.9 kg)",["±1 lb","±5 lbs","±0.5 kg"]],
-["Manual BP must be within what range of the evaluator?","±8 mm Hg",["±4 mm Hg","±10 mm Hg","±2 mm Hg"]],
-["Manual BP: inflate the cuff to…","160–180 mm Hg",["120–140 mm Hg","200–220 mm Hg","Until the needle stops"]],
-["Manual BP: if a beat is heard right away on deflation, re-inflate to no more than…","200 mm Hg",["180 mm Hg","220 mm Hg","250 mm Hg"]],
-["Manual BP readings are rounded…","Up to the nearest 2 mm Hg",["Down to the nearest 2","To the nearest 5","To the nearest 10"]],
-["Before feeding or mouth care, the client sits at…","75–90 degrees",["30–45 degrees","45–60 degrees","Flat"]],
-["Ambulating with a transfer belt: how far do you walk?","10 feet",["5 feet","20 feet","Across the room and back"]],
-["When ambulating, you walk…","Slightly behind and to one side",["Directly in front","Directly beside, arm linked","Directly behind"]],
-["PROM movements are done at least…","3 times each, unless pain is reported",["5 times each","10 times each","Once each"]],
-["Dressing a client with a weak right arm: which sleeve goes on first?","The weak (right) arm",["The strong (left) arm","Either, as long as it's gentle","Both at the same time"]],
-["Undressing a client with a weak right arm: which side comes off first?","The left (unaffected) side",["The right (affected) side","Either","Cut the gown off"]],
-["Catheter care: clean at least how far from the meatus?","4 inches",["2 inches","6 inches","1 inch"]],
-["Peri-care: which direction do you wash?","Front to back",["Back to front","Circular motions","Either, with a clean cloth"]],
-["Bed bath: how do you wash the eyes?","Water only, inner to outer, clean area each stroke",["Soap and water, outer to inner","Water only, outer to inner","Mild soap, inner to outer"]],
-["Foot care: where do you NOT put lotion?","Between the toes",["On the heel","On the top of the foot","On the sole"]],
-["Position on side: which side rail do you raise?","The side the client turns toward",["The side you stand on","Both rails","Neither"]],
-["Elastic stocking: how is the stocking prepared?","Turned inside out to the heel",["Rolled up from the top","Turned fully inside out","Folded in half"]],
-["Removing PPE: what comes off first?","Gloves",["Gown","Gown and gloves together","Whichever is dirtiest"]],
-["Electronic BP: if the cuff inflates above 200 mm Hg you…","Stop and use the other arm",["Let it finish","Restart on the same arm","Switch to a manual cuff"]],
-["Wheelchair transfer: what's the critical step before standing the client?","Lock the wheelchair wheels",["Remove the armrests","Put on gloves","Raise the bed to its highest"]],
-["Weighing a client: before they step on, you…","Set the scale to zero",["Have them remove shoes","Record their last weight","Lock the scale"]],
-["When do you wash hands in the vital-sign skills?","Before recording the result",["After recording","Only before starting","Not required"]]
-];
 const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const app=document.getElementById('app');
-const MODES=[["drill","Step practice"],["flash","Recall flashcards"],["quiz","Quick quiz"]];
+const MODES=[["drill","Step practice"],["flash","Recall flashcards"],["review","Review all skills"]];
 let mode="drill",skill=-1;
 const tabs=document.getElementById('tabs');
 MODES.forEach(([k,l])=>{const b=document.createElement('button');b.className='tab';b.textContent=l;b.onclick=()=>{mode=k;render()};b.dataset.k=k;tabs.appendChild(b)});
@@ -126,11 +103,11 @@ function nextSkill(){const p=skill;do{skill=Math.random()*S.length|0}while(S.len
 // is never unanswerable.
 function drill(){nextSkill();(S[skill][1].some(s=>s[1])&&Math.random()<.5?crit:order)()}
 function flashNew(){nextSkill();flash()}
-function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,flash:flashNew,quiz})[mode]()}
+function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,flash:flashNew,review})[mode]()}
 
 function order(){
   const steps=S[skill][1];const idx=shuf(steps.map((_,i)=>i));let picked=[];
-  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button><button class="b p" id="new">Next skill</button></div>`;
+  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Tap the steps in the order you'd do them.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b" id="undo">Undo</button><button class="b" id="again">Reshuffle</button><button class="b p" id="new">Next skill</button></div>`;
   const pool=document.getElementById('pool'),out=document.getElementById('out');
   function draw(){
     pool.innerHTML=idx.map(i=>`<button class="item ${picked.includes(i)?'used':''}" data-i="${i}"><span class="n">${picked.includes(i)?picked.indexOf(i)+1:'·'}</span><span>${esc(steps[i][0])}</span></button>`).join('');
@@ -150,7 +127,7 @@ function order(){
 
 function crit(){
   const steps=S[skill][1];let sel=new Set();
-  app.innerHTML=`<p class="qtype">Critical Steps</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check</button></div>`;
+  app.innerHTML=`<p class="qtype">Critical Steps</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Check</button></div>`;
   const l=document.getElementById('l');
   l.innerHTML=steps.map((s,i)=>`<button class="item" data-i="${i}"><span class="n">${i+1}</span><span>${esc(s[0])}</span></button>`).join('');
   l.querySelectorAll('.item').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel')});
@@ -166,7 +143,7 @@ function crit(){
 
 function flash(){
   const steps=S[skill][1];let shown=0;
-  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}, drawn at random. Say each step out loud, then reveal it to check yourself.</p><div class="prog"><i id="pg" style="width:0"></i></div><div class="list flash" id="l"></div><div class="row"><button class="b p" id="nx">Reveal next step</button><button class="b" id="all">Show all</button><button class="b" id="new">Next skill</button></div>`;
+  app.innerHTML=`<h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Say each step out loud, then reveal it to check yourself.</p><div class="prog"><i id="pg" style="width:0"></i></div><div class="list flash" id="l"></div><div class="row"><button class="b p" id="nx">Reveal next step</button><button class="b" id="all">Show all</button><button class="b" id="new">Next skill</button></div>`;
   const l=document.getElementById('l');
   function draw(){l.innerHTML=steps.slice(0,shown).map((s,i)=>`<div class="item"><span class="n">${i+1}</span><span>${esc(s[0])}${s[1]?'<span class="tag">critical</span>':''}</span></div>`).join('')||'<p class="hint">What\'s step 1?</p>';document.getElementById('pg').style.width=(shown/steps.length*100)+'%';const nx=document.getElementById('nx');nx.disabled=shown>=steps.length;nx.textContent=shown>=steps.length?'Done':`Reveal step ${shown+1}`}
   document.getElementById('nx').onclick=()=>{shown++;draw()};
@@ -175,31 +152,13 @@ function flash(){
   draw();
 }
 
-function makeQ(){
-  if(Math.random()<.5){const f=FACTS[Math.random()*FACTS.length|0];return {q:f[0],a:f[1],opts:shuf([f[1],...f[2]])}}
-  const si=Math.random()*S.length|0,st=S[si][1];
-  if(Math.random()<.5){
-    const crits=st.filter(s=>s[1]),non=st.filter(s=>!s[1]);
-    const c=crits[Math.random()*crits.length|0][0];
-    return {q:`${S[si][0]}: which of these is a critical element step?`,a:c,opts:shuf([c,...shuf(non).slice(0,3).map(s=>s[0])])};
-  }
-  const i=Math.random()*(st.length-1)|0,a=st[i+1][0];
-  const others=shuf(st.filter((_,k)=>k!=i+1&&k!=i)).slice(0,3).map(s=>s[0]);
-  return {q:`${S[si][0]}: what comes right after "${st[i][0]}"?`,a,opts:shuf([a,...others])};
-}
-let qs={n:0,r:0};
-function quiz(){
-  const Q=makeQ();
-  app.innerHTML=`<p class="hint">Score: ${qs.r}/${qs.n}${qs.n?` (${Math.round(qs.r/qs.n*100)}%)`:''} · <a href="#" id="rs" style="color:var(--acc)">reset</a></p><h2>${esc(Q.q)}</h2><div class="list" id="l"></div><div class="row"><button class="b p" id="nx" style="display:none">Next question</button></div>`;
-  const l=document.getElementById('l');
-  l.innerHTML=Q.opts.map(o=>`<button class="item opt"><span>${esc(o)}</span></button>`).join('');
-  [...l.children].forEach((b,k)=>b.onclick=()=>{
-    const ok=Q.opts[k]==Q.a;qs.n++;if(ok)qs.r++;
-    [...l.children].forEach((c,j)=>{c.style.pointerEvents='none';if(Q.opts[j]==Q.a)c.classList.add('ok');else if(j==k)c.classList.add('no')});
-    document.getElementById('nx').style.display='';
-  });
-  document.getElementById('nx').onclick=quiz;
-  document.getElementById('rs').onclick=e=>{e.preventDefault();qs={n:0,r:0};quiz()};
+function review(){
+  const n=s=>s[1].filter(x=>x[1]).length;
+  app.innerHTML=`<p class="hint">All ${S.length} skills with their steps in order. Critical element steps are tagged — missing one fails the skill.</p><div class="row"><button class="b" id="exp">Expand all</button><button class="b" id="col">Collapse all</button></div>`+
+    S.map((sk,i)=>`<details class="rev"><summary><strong>${i+1}. ${esc(sk[0])}</strong><span class="cnt">${sk[1].length} steps${n(sk)?` · ${n(sk)} critical`:''}</span></summary><ol class="revl">${sk[1].map(st=>`<li>${esc(st[0])}${st[1]?'<span class="tag">critical</span>':''}</li>`).join('')}</ol></details>`).join('');
+  const all=o=>app.querySelectorAll('details.rev').forEach(d=>d.open=o);
+  document.getElementById('exp').onclick=()=>all(true);
+  document.getElementById('col').onclick=()=>all(false);
 }
 render();
 </script>

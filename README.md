@@ -4,12 +4,14 @@ A single-page practice tool for the 23 nurse aide skills on the Credentia skills
 
 ## Modes
 
-Every mode draws a skill at random; there is no skill picker.
+The two practice modes draw a skill at random; there is no skill picker.
 
 - **Step practice**: a random skill, then at random either putting its steps back in
-  sequence or marking its critical element steps (missing one fails the skill).
+  sequence or marking its critical element steps (missing one fails the skill). Each round
+  is labelled "Determine Order" or "Critical Steps" above the skill name.
 - **Recall flashcards**: say each step out loud, then reveal it.
-- **Quick quiz**: random multiple-choice questions on tolerances, angles, critical steps and "what comes next."
+- **Review all skills**: every skill and every step in order, critical steps tagged, as
+  collapsible sections. For looking something up rather than being tested on it.
 
 ## Run it
 
@@ -23,7 +25,7 @@ Hosting is GitHub Pages, serving `main` at the repository root. Pushing to `main
 
 All skill data lives in the `S` array near the top of the script in `index.html`. Each skill is
 `["Name", [["step text"], ["critical step text", 1], ...]]`, where a trailing `1` marks a critical step.
-Fact-quiz questions are in the `FACTS` array.
+Step practice, flashcards and review all read from that one array.
 
 Skills 5, 17 and 19 currently have no step flagged critical, so step practice always gives them
 the ordering task rather than an unanswerable "spot the critical steps" round. Add a trailing `1`
