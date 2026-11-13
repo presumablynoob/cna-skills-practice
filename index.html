@@ -40,6 +40,7 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .item.sel{background:var(--acc2);border-color:var(--acc)}
 .item.ok{background:var(--acc2);border-color:var(--acc)}
 .item.no{background:var(--bad2);border-color:var(--bad)}
+.item .n.wrong{color:var(--bad);background:transparent;box-shadow:inset 0 0 0 1px var(--bad)}
 .item.miss{background:var(--warn2);border-color:var(--warn)}
 .qtype+h2{margin-top:0}
 .qtype{display:inline-block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--acc);background:var(--acc2);border:1px solid var(--acc);padding:3px 11px;border-radius:999px;margin:0 0 10px}
@@ -176,7 +177,7 @@ function order(){
   }
   function check(){
     let right=0;
-    pool.innerHTML=cur.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n">${pos+1}</span><span>${steps[i][1]?`<strong>${esc(steps[i][0])}</strong><span class="tag">critical</span>`:esc(steps[i][0])}${ok?'':`<br><small style="color:var(--mute)">Should be step ${i+1}</small>`}</span></div>`}).join('');
+    pool.innerHTML=cur.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n${ok?'':' wrong'}">${i+1}</span><span>${steps[i][1]?`<strong>${esc(steps[i][0])}</strong><span class="tag">critical</span>`:esc(steps[i][0])}</span></div>`}).join('');
     out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol>${steps.map(s=>`<li>${s[1]?`<strong>${esc(s[0])}</strong><span class="tag">critical</span>`:esc(s[0])}</li>`).join('')}</ol></details>`;
     document.getElementById('chk').disabled=true;
   }
