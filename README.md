@@ -19,6 +19,13 @@ but much longer – up to 49 steps against Credentia's 20. Check which provider 
 
 ## Modes
 
+- **Skills**: reference rather than testing, with two views. **Focus** (the default) shows
+  one skill at a time, with a dropdown to jump straight to a skill and Previous/Next buttons
+  that wrap around; **List** shows every skill as a collapsible section with Expand/Collapse
+  all. Both show every step in order with critical steps bold, italic and tagged, and under
+  Credentia, Focus also embeds that skill's video walkthrough. The chosen view and your place
+  in it survive switching tabs. Graded lists in Practice Exam keep critical steps bold only.
+
 - **Practice Exam**: a fixed-length exam. Opening the tab asks for a length (10, 20 or 35
   questions) and a Start exam button. Each question draws a skill at random and either puts
   its steps in order or asks for its critical element steps; the round is labelled "Determine
@@ -41,12 +48,6 @@ but much longer – up to 49 steps against Credentia's 20. Check which provider 
   abandons it, since the skills change underneath. On a touch screen a swipe still
   scrolls the list: dragging a row starts after a short hold, or immediately from the
   numbered handle.
-- **Skills**: reference rather than testing, with two views. **Focus** (the default) shows
-  one skill at a time, with a dropdown to jump straight to a skill and Previous/Next buttons
-  that wrap around; **List** shows every skill as a collapsible section with Expand/Collapse
-  all. Both show every step in order with critical steps bold, italic and tagged, and under
-  Credentia, Focus also embeds that skill's video walkthrough. The chosen view and your place
-  in it survive switching tabs. Graded lists in Practice Exam keep critical steps bold only.
 
 Critical steps are shown bold wherever they are revealed, never before, so a "Critical Steps"
 round does not give away its own answer. A skill with no critical step flagged always draws the
