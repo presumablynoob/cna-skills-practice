@@ -23,8 +23,10 @@ but much longer – up to 49 steps against Credentia's 20. Check which provider 
   questions) and a Start exam button. Each question draws a skill at random and either puts
   its steps in order or asks for its critical element steps; the round is labelled "Determine
   Order" or "Critical Steps" above the skill name. A bar across the top tracks the question
-  number, how many are right, wrong and still to go, a running percentage, and an End exam
-  link. **Questions cannot be skipped**: Next question stays disabled until you submit, and
+  number, how many are right, wrong and still to go, how far through the exam you are, and an
+  End exam link. The bar under it fills as you answer: green for the correct answers, red for
+  the wrong ones, the rest left as unanswered track. The only score-as-percentage is in the
+  recap at the end. **Questions cannot be skipped**: Next question stays disabled until you submit, and
   Submit disables once used. A question counts as right only if it is completely right. At the
   end comes a recap: the overall score and percentage, then the missed questions and the
   correct ones, each with its skill and how it was scored.

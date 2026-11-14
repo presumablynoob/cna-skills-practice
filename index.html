@@ -49,8 +49,10 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .xno{color:var(--bad);font-weight:600}
 .xpct{margin-left:auto;font-weight:600}
 .xend{font:inherit;font-size:12px;background:none;border:0;color:var(--mute);cursor:pointer;text-decoration:underline;padding:0}
-.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
-.prog i{display:block;height:100%;background:var(--acc);transition:width .25s}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;display:flex}
+.prog i{height:100%;transition:width .25s}
+.prog .pok{background:var(--acc)}
+.prog .pno{background:var(--bad)}
 .recap{margin:8px 0 18px;padding-left:22px}
 .recap li{margin:9px 0}
 .rtype{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
@@ -197,12 +199,12 @@ function examSetup(){
 // the running tally shown above every question
 function examBar(){
   const done=exam.res.length,right=exam.res.filter(r=>r.ok).length,wrong=done-right;
-  const pct=done?Math.round(right/done*100):0;
+  const pct=Math.round(done/exam.n*100);   // how far through the exam, not the score
   return `<div class="xbar"><div class="xrow"><strong>Question ${exam.i+1} of ${exam.n}</strong>`+
     `<span class="xstat xok">${right} right</span><span class="xstat xno">${wrong} wrong</span>`+
-    `<span class="xstat">${exam.n-done} to go</span><span class="xpct">${pct}%</span>`+
+    `<span class="xstat">${exam.n-done} to go</span><span class="xpct">${pct}% done</span>`+
     `<button class="xend" id="xend">End exam</button></div>`+
-    `<div class="prog"><i style="width:${Math.round(done/exam.n*100)}%"></i></div></div>`;
+    `<div class="prog"><i class="pok" style="width:${right/exam.n*100}%"></i><i class="pno" style="width:${wrong/exam.n*100}%"></i></div></div>`;
 }
 function examWire(){
   const e=document.getElementById('xend');
