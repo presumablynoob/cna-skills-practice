@@ -1,6 +1,21 @@
 # CNA Skills Practice
 
-A single-page practice tool for the 23 nurse aide skills on the Credentia skills evaluation.
+A single-page practice tool for the California nurse aide skills test, covering both test
+providers used in the state. Every step is quoted in the provider's own wording, not paraphrased.
+
+## Providers
+
+A toggle at the top switches the whole app between the two, and **Credentia is the default**.
+Switching reloads both tabs against that provider's list.
+
+| | Skills | Steps | Critical steps | Video walkthroughs |
+|---|---|---|---|---|
+| **Credentia** | 23 | 286 | 27 | 22 of 23 |
+| **Headmaster** | 18 | 451 | 36 | none |
+
+The two lists are not the same material. Headmaster bundles tasks that Credentia keeps separate
+(its bedpan skill also covers measuring urine output and hand washing), so its skills are fewer
+but much longer. Check which provider your test site uses before drilling.
 
 ## Modes
 
@@ -13,14 +28,14 @@ A single-page practice tool for the 23 nurse aide skills on the Credentia skills
   numbered handle.
 - **Skills**: reference rather than testing, with two views. **Focus** (the default) shows
   one skill at a time, with a dropdown to jump straight to a skill and Previous/Next buttons
-  that wrap around; **List** shows all 23 as
-  collapsible sections with Expand/Collapse all. Both show every step in order with critical
-  steps bold, italic and tagged, and Focus also embeds that skill's video walkthrough. The
-  chosen view and your place in it survive switching tabs. Graded lists in Practice Exam
-  keep critical steps bold only.
+  that wrap around; **List** shows every skill as a collapsible section with Expand/Collapse
+  all. Both show every step in order with critical steps bold, italic and tagged, and under
+  Credentia, Focus also embeds that skill's video walkthrough. The chosen view and your place
+  in it survive switching tabs. Graded lists in Practice Exam keep critical steps bold only.
 
 Critical steps are shown bold wherever they are revealed, never before, so a "Critical Steps"
-round does not give away its own answer.
+round does not give away its own answer. A skill with no critical step flagged always draws the
+ordering task instead, so a round is never unanswerable.
 
 ## Run it
 
@@ -32,22 +47,33 @@ Hosting is GitHub Pages, serving `main` at the repository root. Pushing to `main
 
 ## Editing skills
 
-All skill data lives in the `S` array near the top of the script in `index.html`. Each skill is
-`["Name", [["step text"], ["critical step text", 1], ...]]`, where a trailing `1` marks a critical step.
-Both tabs read from that one array.
+Both lists live in the `PROV` object near the top of the script in `index.html`:
 
-Skills 5, 17 and 19 currently have no step flagged critical, so Practice Exam always gives them
-the ordering task rather than an unanswerable "spot the critical steps" round. Add a trailing `1`
-to the relevant steps if your state's handbook marks any.
+```js
+PROV.credentia.skills = [ ["Skill name", [["step text"], ["critical step text", 1], ...]], ... ]
+```
 
-## Source
+A trailing `1` marks a critical element step. `PROV.<provider>.videos` is index-aligned with that
+provider's `skills`; `null` means no video for that skill, and `videos: null` (Headmaster) drops
+the video section entirely. `blurb`, `src`, `srcName` and `note` fill the subtitle and the footer.
 
-Steps are paraphrased from [Credentia's skills page](https://kb-nc.credentia.com/en/article/skills).
-Always check against the official candidate handbook for your state. In California, manual blood
-pressure (Skill 23) is tested, not electronic (Skill 12).
+## Sources
+
+Step wording is quoted verbatim, so corrections belong upstream rather than here.
+
+- **Credentia** — [California candidate handbook skills list](https://kb-nc.credentia.com/en/article/skills).
+  Critical element steps are the ones that page sets in bold. In California, manual blood
+  pressure (Skill 23) is tested, not electronic (Skill 12).
+- **Headmaster** — [California Mock Skills](https://hdmaster.com/assets/ca-mock-skills.pdf)
+  (PDF, effective for testing 1 February 2026). Critical steps are the ones set in bold in that
+  document; the steps are extracted from the PDF text, with each step's `a.`/`b.` sub-points and
+  scoring criteria folded into it. Headmaster states these steps are guidelines for preparing
+  candidates, not complete care.
+
+Always check against the official candidate handbook for your state before the exam.
 
 Video walkthroughs come from the [Credentia CNA Skills (Updated)](https://www.youtube.com/playlist?list=PL7D7SigffS4ms3_ff_0mGLx55c0sgRlg7)
-playlist by XY Nursing Skills, who state they are not affiliated with Credentia. Their IDs are in
-the `V` array, index-aligned with `S`; `null` means no video. The playlist has none for skill 12
-(electronic blood pressure), so that skill shows a link to the playlist instead. Embeds use
-`youtube-nocookie.com`, and only the focused skill's player is on the page at a time.
+playlist by XY Nursing Skills, who state they are not affiliated with Credentia. The playlist has
+no video for Credentia skill 12 (electronic blood pressure), so that skill links to the playlist
+instead. There is no equivalent playlist for Headmaster. Embeds use `youtube-nocookie.com`, and
+only the focused skill's player is on the page at a time.
