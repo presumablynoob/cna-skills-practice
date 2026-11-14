@@ -46,6 +46,11 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--bad2);color:var(--bad);margin-left:6px;white-space:nowrap}
 .score{font-weight:600;margin:10px 0}
 .opt{margin:6px 0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card);margin-bottom:12px}
+.seg .sb{font:inherit;font-size:13px;font-weight:500;padding:5px 15px;border:0;background:transparent;color:var(--mute);cursor:pointer}
+.seg .sb.on{background:var(--acc);color:#fff}
+.revl.focus{margin:12px 0 18px}
+.revl.focus li{margin:8px 0}
 .rev{border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--card)}
 .rev summary{padding:10px 12px;cursor:pointer;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;list-style:none}
 .rev summary::-webkit-details-marker{display:none}
@@ -99,6 +104,7 @@ const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const app=document.getElementById('app');
 const MODES=[["drill","Practice Exam"],["review","Skills"]];
 let mode="drill",skill=-1;
+let revView="focus",revIdx=0;  // Skills tab: focus one skill, or list them all
 const tabs=document.getElementById('tabs');
 MODES.forEach(([k,l])=>{const b=document.createElement('button');b.className='tab';b.textContent=l;b.onclick=()=>{mode=k;render()};b.dataset.k=k;tabs.appendChild(b)});
 // draw a random skill, never the same one twice running
@@ -199,12 +205,24 @@ function crit(){
 }
 
 function review(){
-  const n=s=>s[1].filter(x=>x[1]).length;
-  app.innerHTML=`<p class="hint">All ${S.length} skills with their steps in order. Critical element steps are tagged — missing one fails the skill.</p><div class="row"><button class="b" id="exp">Expand all</button><button class="b" id="col">Collapse all</button></div>`+
-    S.map((sk,i)=>`<details class="rev"><summary><strong>${i+1}. ${esc(sk[0])}</strong><span class="cnt">${sk[1].length} steps${n(sk)?` · ${n(sk)} critical`:''}</span></summary><ol class="revl">${sk[1].map(st=>`<li>${st[1]?`<strong>${esc(st[0])}</strong><span class="tag">critical</span>`:esc(st[0])}</li>`).join('')}</ol></details>`).join('');
-  const all=o=>app.querySelectorAll('details.rev').forEach(d=>d.open=o);
-  document.getElementById('exp').onclick=()=>all(true);
-  document.getElementById('col').onclick=()=>all(false);
+  const n=sk=>sk[1].filter(x=>x[1]).length;
+  const stepList=(sk,cls)=>`<ol class="revl${cls||''}">${sk[1].map(st=>`<li>${st[1]?`<strong>${esc(st[0])}</strong><span class="tag">critical</span>`:esc(st[0])}</li>`).join('')}</ol>`;
+  const seg=`<div class="seg"><button class="sb${revView==='focus'?' on':''}" id="vf">Focus</button><button class="sb${revView==='list'?' on':''}" id="vl">List</button></div>`;
+  if(revView==='focus'){
+    const sk=S[revIdx],c=n(sk);
+    app.innerHTML=seg+`<p class="hint">Skill ${revIdx+1} of ${S.length} · ${sk[1].length} steps${c?` · ${c} critical`:' · none flagged critical'}</p><h2>${esc(sk[0])}</h2>`+stepList(sk,' focus')+
+      `<div class="row"><button class="b" id="prev">← Previous</button><button class="b" id="next">Next →</button></div>`;
+    document.getElementById('prev').onclick=()=>{revIdx=(revIdx-1+S.length)%S.length;review()};
+    document.getElementById('next').onclick=()=>{revIdx=(revIdx+1)%S.length;review()};
+  }else{
+    app.innerHTML=seg+`<p class="hint">All ${S.length} skills with their steps in order. Critical element steps are tagged — missing one fails the skill.</p><div class="row"><button class="b" id="exp">Expand all</button><button class="b" id="col">Collapse all</button></div>`+
+      S.map((sk,i)=>`<details class="rev"><summary><strong>${i+1}. ${esc(sk[0])}</strong><span class="cnt">${sk[1].length} steps${n(sk)?` · ${n(sk)} critical`:''}</span></summary>${stepList(sk)}</details>`).join('');
+    const all=o=>app.querySelectorAll('details.rev').forEach(d=>d.open=o);
+    document.getElementById('exp').onclick=()=>all(true);
+    document.getElementById('col').onclick=()=>all(false);
+  }
+  document.getElementById('vf').onclick=()=>{revView='focus';review()};
+  document.getElementById('vl').onclick=()=>{revView='list';review()};
 }
 render();
 </script>
