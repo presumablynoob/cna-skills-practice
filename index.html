@@ -215,7 +215,7 @@ function crit(){
 
 function review(){
   const n=sk=>sk[1].filter(x=>x[1]).length;
-  const stepList=(sk,cls)=>`<ol class="revl${cls||''}">${sk[1].map(st=>`<li>${st[1]?`<strong>${esc(st[0])}</strong><span class="tag">critical</span>`:esc(st[0])}</li>`).join('')}</ol>`;
+  const stepList=(sk,cls)=>`<ol class="revl${cls||''}">${sk[1].map(st=>`<li>${st[1]?`<strong><em>${esc(st[0])}</em></strong><span class="tag">critical</span>`:esc(st[0])}</li>`).join('')}</ol>`;
   const seg=`<div class="seg"><button class="sb${revView==='focus'?' on':''}" id="vf">Focus</button><button class="sb${revView==='list'?' on':''}" id="vl">List</button></div>`;
   if(revView==='focus'){
     const sk=S[revIdx],c=n(sk);

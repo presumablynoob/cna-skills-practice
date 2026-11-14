@@ -14,8 +14,9 @@ A single-page practice tool for the 23 nurse aide skills on the Credentia skills
 - **Skills**: reference rather than testing, with two views. **Focus** (the default) shows
   one skill at a time with Previous/Next buttons that wrap around; **List** shows all 23 as
   collapsible sections with Expand/Collapse all. Both show every step in order with critical
-  steps bold and tagged, and Focus also embeds that skill's video walkthrough. The chosen
-  view and your place in it survive switching tabs.
+  steps bold, italic and tagged, and Focus also embeds that skill's video walkthrough. The
+  chosen view and your place in it survive switching tabs. Graded lists in Practice Exam
+  keep critical steps bold only.
 
 Critical steps are shown bold wherever they are revealed, never before, so a "Critical Steps"
 round does not give away its own answer.
