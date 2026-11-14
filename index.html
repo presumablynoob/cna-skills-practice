@@ -46,6 +46,11 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--bad2);color:var(--bad);margin-left:6px;white-space:nowrap}
 .score{font-weight:600;margin:10px 0}
 .opt{margin:6px 0}
+.vh{font-family:Fraunces,serif;font-weight:600;font-size:15px;margin:18px 0 8px}
+.vid{position:relative;width:100%;aspect-ratio:16/9;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#000}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vcred{color:var(--mute);font-size:12px;margin:8px 0 16px}
+.vcred a{color:var(--acc)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card);margin-bottom:12px}
 .seg .sb{font:inherit;font-size:13px;font-weight:500;padding:5px 15px;border:0;background:transparent;color:var(--mute);cursor:pointer}
 .seg .sb.on{background:var(--acc);color:#fff}
@@ -99,6 +104,10 @@ const S=[
 ["Transfer Bed to Wheelchair Using Transfer Belt",[["Explain the procedure"],["Provide privacy"],["Wheelchair alongside bed at head or foot, facing correctly"],["Fold up or remove footrests"],["Lock wheelchair wheels",1],["Bring bed to a safe height"],["Check/lock bed wheels"],["Assist client to sit with feet flat on floor",1],["Confirm client is wearing shoes"],["Apply transfer belt snugly at waist over clothing"],["Give instructions and prearranged signal"],["Stand facing client, count to three"],["On signal, assist to stand grasping belt both sides, knee to knee or toe to toe"],["Help client turn so backs of legs touch wheelchair"],["Lower client into wheelchair"],["Hips against back of chair; remove belt"],["Feet on footrests"],["Signaling device in reach"],["Wash hands"]]],
 ["Measure and Record Manual Blood Pressure",[["Explain the procedure"],["Wipe stethoscope bell/diaphragm and earpieces with alcohol"],["Arm palm up, upper arm exposed"],["Locate brachial artery at inner elbow"],["Place cuff snugly, sensor/arrow over artery"],["Earpieces in, bell/diaphragm over artery"],["Inflate to 160–180 mm Hg; if beat heard right away, deflate fully and re-inflate to no more than 200"],["Deflate slowly; first sound = systolic, last = diastolic; round up to nearest 2"],["Remove cuff"],["Signaling device in reach"],["Wash hands before recording"],["Record systolic and diastolic each within ±8 mm Hg of evaluator",1]]]
 ];
+// Walkthroughs from the "Credentia CNA Skills (Updated)" playlist by XY Nursing Skills,
+// index-aligned with S. Skill 12 (electronic BP) has no video in that playlist.
+const PL="PL7D7SigffS4ms3_ff_0mGLx55c0sgRlg7";
+const V=["SBcdcx8YxYE","rDtcfr4SbC0","FU_BwEsSC6M","tMZEjG4JPYU","8apaMLehiCU","5b037N-8vfo","ncWbx72iCKg","kU_E2u6B38Q","9N5KhcS0e5A","ewGZqjG6rqw","3Ik1tei8YK8",null,"fzFA3RTN-EM","L0kT8bxXJq0","5bwJkj1GNZM","Byhg7wSp31I","0GvgPGMWsSs","9zfh8ccvP2o","o5KoWP-r2GI","6byMwcl5pQw","Kq76nK4uJ8s","zdDsymIYXdM","i4ThFNHGl4g"];
 const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const app=document.getElementById('app');
@@ -210,7 +219,11 @@ function review(){
   const seg=`<div class="seg"><button class="sb${revView==='focus'?' on':''}" id="vf">Focus</button><button class="sb${revView==='list'?' on':''}" id="vl">List</button></div>`;
   if(revView==='focus'){
     const sk=S[revIdx],c=n(sk);
-    app.innerHTML=seg+`<p class="hint">Skill ${revIdx+1} of ${S.length} · ${sk[1].length} steps${c?` · ${c} critical`:' · none flagged critical'}</p><h2>${esc(sk[0])}</h2>`+stepList(sk,' focus')+
+    const vid=V[revIdx];
+    const video=vid
+      ? `<h3 class="vh">Video walkthrough</h3><div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/${vid}" title="${esc(sk[0])} walkthrough" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div><p class="vcred">Video by XY Nursing Skills, not affiliated with Credentia · <a href="https://www.youtube.com/watch?v=${vid}&list=${PL}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a></p>`
+      : `<p class="vcred">This playlist has no walkthrough for skill ${revIdx+1} · <a href="https://www.youtube.com/playlist?list=${PL}" target="_blank" rel="noopener noreferrer">browse it on YouTube</a></p>`;
+    app.innerHTML=seg+`<p class="hint">Skill ${revIdx+1} of ${S.length} · ${sk[1].length} steps${c?` · ${c} critical`:' · none flagged critical'}</p><h2>${esc(sk[0])}</h2>`+stepList(sk,' focus')+video+
       `<div class="row"><button class="b" id="prev">← Previous</button><button class="b" id="next">Next →</button></div>`;
     document.getElementById('prev').onclick=()=>{revIdx=(revIdx-1+S.length)%S.length;review()};
     document.getElementById('next').onclick=()=>{revIdx=(revIdx+1)%S.length;review()};

@@ -14,7 +14,8 @@ A single-page practice tool for the 23 nurse aide skills on the Credentia skills
 - **Skills**: reference rather than testing, with two views. **Focus** (the default) shows
   one skill at a time with Previous/Next buttons that wrap around; **List** shows all 23 as
   collapsible sections with Expand/Collapse all. Both show every step in order with critical
-  steps bold and tagged. The chosen view and your place in it survive switching tabs.
+  steps bold and tagged, and Focus also embeds that skill's video walkthrough. The chosen
+  view and your place in it survive switching tabs.
 
 Critical steps are shown bold wherever they are revealed, never before, so a "Critical Steps"
 round does not give away its own answer.
@@ -42,3 +43,9 @@ to the relevant steps if your state's handbook marks any.
 Steps are paraphrased from [Credentia's skills page](https://kb-nc.credentia.com/en/article/skills).
 Always check against the official candidate handbook for your state. In California, manual blood
 pressure (Skill 23) is tested, not electronic (Skill 12).
+
+Video walkthroughs come from the [Credentia CNA Skills (Updated)](https://www.youtube.com/playlist?list=PL7D7SigffS4ms3_ff_0mGLx55c0sgRlg7)
+playlist by XY Nursing Skills, who state they are not affiliated with Credentia. Their IDs are in
+the `V` array, index-aligned with `S`; `null` means no video. The playlist has none for skill 12
+(electronic blood pressure), so that skill shows a link to the playlist instead. Embeds use
+`youtube-nocookie.com`, and only the focused skill's player is on the page at a time.
