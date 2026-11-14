@@ -42,6 +42,19 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .item.no{background:var(--bad2);border-color:var(--bad)}
 .item .n.wrong{color:var(--bad);background:transparent;box-shadow:inset 0 0 0 1px var(--bad)}
 .item.miss{background:var(--warn2);border-color:var(--warn)}
+.xbar{margin:0 0 16px}
+.xrow{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-size:13px;margin-bottom:8px}
+.xstat{color:var(--mute)}
+.xok{color:var(--acc);font-weight:600}
+.xno{color:var(--bad);font-weight:600}
+.xpct{margin-left:auto;font-weight:600}
+.xend{font:inherit;font-size:12px;background:none;border:0;color:var(--mute);cursor:pointer;text-decoration:underline;padding:0}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--acc);transition:width .25s}
+.recap{margin:8px 0 18px;padding-left:22px}
+.recap li{margin:9px 0}
+.rtype{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+.recap small{color:var(--mute)}
 .qtype+h2{margin-top:0}
 .qtype{display:inline-block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--acc);background:var(--acc2);border:1px solid var(--acc);padding:3px 11px;border-radius:999px;margin:0 0 10px}
 .tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--bad2);color:var(--bad);margin-left:6px;white-space:nowrap}
@@ -164,7 +177,52 @@ function nextSkill(){const p=skill;do{skill=Math.random()*S.length|0}while(S.len
 // step practice: random skill, then randomly either ordering or critical steps.
 // Skills with no critical steps flagged always get the ordering task, so a round
 // is never unanswerable.
-function drill(){nextSkill();(S[skill][1].some(s=>s[1])&&Math.random()<.5?crit:order)()}
+// Practice Exam runs a fixed-length exam: pick a length, answer every question
+// in turn without skipping, then read the recap.
+const LENGTHS=[10,20,35];
+let exam=null,examLen=10;
+function drill(){
+  if(!exam)return examSetup();
+  if(exam.i>=exam.n)return examRecap();
+  nextSkill();
+  (S[skill][1].some(s=>s[1])&&Math.random()<.5?crit:order)();
+}
+function examSetup(){
+  app.innerHTML=`<h2>Practice exam</h2><p class="hint">Questions are drawn at random from the ${S.length} ${esc(PROV[prov].label)} skills, each one either putting a skill's steps in order or picking out its critical steps. You cannot skip a question, and you get a recap at the end.</p>`+
+    `<p class="hint" style="margin-bottom:6px">How many questions?</p><div class="seg" id="lens">${LENGTHS.map(n=>`<button class="sb${n===examLen?' on':''}" data-n="${n}">${n}</button>`).join('')}</div>`+
+    `<div class="row"><button class="b p" id="startx">Start exam</button></div>`;
+  app.querySelectorAll('#lens .sb').forEach(b=>b.onclick=()=>{examLen=+b.dataset.n;examSetup()});
+  document.getElementById('startx').onclick=()=>{exam={n:examLen,i:0,res:[]};skill=-1;drill()};
+}
+// the running tally shown above every question
+function examBar(){
+  const done=exam.res.length,right=exam.res.filter(r=>r.ok).length,wrong=done-right;
+  const pct=done?Math.round(right/done*100):0;
+  return `<div class="xbar"><div class="xrow"><strong>Question ${exam.i+1} of ${exam.n}</strong>`+
+    `<span class="xstat xok">${right} right</span><span class="xstat xno">${wrong} wrong</span>`+
+    `<span class="xstat">${exam.n-done} to go</span><span class="xpct">${pct}%</span>`+
+    `<button class="xend" id="xend">End exam</button></div>`+
+    `<div class="prog"><i style="width:${Math.round(done/exam.n*100)}%"></i></div></div>`;
+}
+function examWire(){
+  const e=document.getElementById('xend');
+  if(e)e.onclick=()=>{exam=null;drill()};
+}
+function examRecord(type,ok,detail){
+  exam.res.push({type,name:S[skill][0],ok,detail});
+  const n=document.getElementById('nextq');
+  if(n){n.disabled=false;n.onclick=()=>{exam.i++;drill()}}
+}
+function examRecap(){
+  const right=exam.res.filter(r=>r.ok),wrong=exam.res.filter(r=>!r.ok);
+  const pct=Math.round(right.length/exam.res.length*100);
+  const list=rs=>`<ol class="recap">${rs.map(r=>`<li><span class="rtype">${r.type}</span> ${esc(r.name)}<br><small>${esc(r.detail)}</small></li>`).join('')}</ol>`;
+  app.innerHTML=`<h2>Exam complete</h2><p class="score">${right.length} of ${exam.res.length} correct · ${pct}%</p>`+
+    (wrong.length?`<h3 class="vh">Missed (${wrong.length})</h3>`+list(wrong):'')+
+    (right.length?`<h3 class="vh">Correct (${right.length})</h3>`+list(right):'')+
+    `<div class="row"><button class="b p" id="again2">New exam</button></div>`;
+  document.getElementById('again2').onclick=()=>{exam=null;drill()};
+}
 const provBar=document.getElementById('prov');
 Object.keys(PROV).forEach(k=>{const b=document.createElement('button');b.className='sb';b.dataset.p=k;b.textContent=PROV[k].label;b.onclick=()=>setProv(k);provBar.appendChild(b)});
 function chrome(){
@@ -176,7 +234,7 @@ function chrome(){
 function setProv(k){
   if(k===prov)return;
   prov=k;S=PROV[k].skills;V=PROV[k].videos||[];
-  skill=-1;revIdx=0;            // the two lists have different skills and lengths
+  skill=-1;revIdx=0;exam=null;  // the two lists have different skills and lengths
   chrome();render();
 }
 function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,review})[mode]()}
@@ -192,7 +250,8 @@ function order(from){
   let cur=shuf(steps.map((_,i)=>i));
   if(steps.length>1&&cur.every((v,i)=>v===i))cur=shuf(cur);
   const part=all.length>len?` Steps ${at+1}–${at+len} of ${all.length}.`:'';
-  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}.${part} Drag the steps into the order you would do them, then submit.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="again">Reshuffle</button><button class="b" id="new">Next</button></div>`;
+  app.innerHTML=examBar()+`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}.${part} Drag the steps into the order you would do them, then submit.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="nextq" disabled>Next question</button></div>`;
+  examWire();
   const pool=document.getElementById('pool'),out=document.getElementById('out');
   const renumber=()=>[...pool.children].forEach((c,k)=>c.querySelector('.n').textContent=k+1);
   const sync=()=>{cur=[...pool.children].map(c=>+c.dataset.i)};
@@ -252,16 +311,16 @@ function order(from){
     pool.innerHTML=cur.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n${ok?'':' wrong'}">${i+1}</span><span>${steps[i][1]?`<strong>${esc(steps[i][0])}</strong><span class="tag">critical</span>`:esc(steps[i][0])}</span></div>`}).join('');
     out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol start="${at+1}">${steps.map(s=>`<li>${s[1]?`<strong>${esc(s[0])}</strong><span class="tag">critical</span>`:esc(s[0])}</li>`).join('')}</ol></details>`;
     document.getElementById('chk').disabled=true;
+    examRecord('Determine Order',right===steps.length,`${right}/${steps.length} in the right position`);
   }
   document.getElementById('chk').onclick=check;
-  document.getElementById('again').onclick=()=>order(at);
-  document.getElementById('new').onclick=drill;
   draw();
 }
 
 function crit(){
   const steps=S[skill][1];let sel=new Set();
-  app.innerHTML=`<p class="qtype">Critical Steps</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="new">Next</button></div>`;
+  app.innerHTML=examBar()+`<p class="qtype">Critical Steps</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Select every step you think is a critical element step (missing one fails the skill). Some skills have just one.</p><div class="list" id="l"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="nextq" disabled>Next question</button></div>`;
+  examWire();
   const l=document.getElementById('l');
   l.innerHTML=steps.map((s,i)=>`<button class="item" data-i="${i}"><span class="n">${i+1}</span><span>${esc(s[0])}</span></button>`).join('');
   l.querySelectorAll('.item').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel')});
@@ -272,8 +331,8 @@ function crit(){
       if(c){const t=b.querySelector('span:last-child');t.innerHTML=`<strong>${t.innerHTML}</strong><span class="tag">critical</span>`}});
     document.getElementById('out').innerHTML=`<p class="score">${hit} found · ${miss} missed · ${fp} wrongly marked</p><p class="hint">Green = got it, yellow = missed critical step, red = not critical.</p>`;
     document.getElementById('chk').disabled=true;
+    examRecord('Critical Steps',miss===0&&fp===0,`${hit} found · ${miss} missed · ${fp} wrongly marked`);
   };
-  document.getElementById('new').onclick=drill;
 }
 
 function review(){

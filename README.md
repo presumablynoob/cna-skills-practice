@@ -19,14 +19,24 @@ but much longer – up to 49 steps against Credentia's 20. Check which provider 
 
 ## Modes
 
-- **Practice Exam**: draws a skill at random, then at random either puts its steps back in
-  sequence or asks you to mark its critical element steps (missing one fails the skill).
-  Each round is labelled "Determine Order" or "Critical Steps" above the skill name. There
-  is no skill picker. Ordering rounds are reordered by dragging a step anywhere on its row;
-  press Submit to grade, then Next for another round. A skill longer than `MAXORDER` (20) is
-  drilled as one random run of consecutive steps rather than all of it at once, and the round
-  says which run, as in "Steps 14-33 of 48"; Reshuffle keeps that run, Next draws a new one.
-  No Credentia skill is long enough to be split; most Headmaster ones are. On a touch screen a swipe still
+- **Practice Exam**: a fixed-length exam. Opening the tab asks for a length (10, 20 or 35
+  questions) and a Start exam button. Each question draws a skill at random and either puts
+  its steps in order or asks for its critical element steps; the round is labelled "Determine
+  Order" or "Critical Steps" above the skill name. A bar across the top tracks the question
+  number, how many are right, wrong and still to go, a running percentage, and an End exam
+  link. **Questions cannot be skipped**: Next question stays disabled until you submit, and
+  Submit disables once used. A question counts as right only if it is completely right. At the
+  end comes a recap: the overall score and percentage, then the missed questions and the
+  correct ones, each with its skill and how it was scored.
+
+  Ordering rounds are reordered by dragging a step anywhere on its row. On a touch screen a
+  swipe still scrolls the list: dragging a row starts after a short hold, or immediately from
+  the numbered handle. A skill longer than `MAXORDER` (20) is drilled as one random run of
+  consecutive steps rather than all of it at once, and the question says which run, as in
+  "Steps 14-33 of 48". No Credentia skill is long enough to be split; most Headmaster ones are.
+
+  Leaving for the Skills tab and coming back resumes the exam where it was. Switching provider
+  abandons it, since the skills change underneath. On a touch screen a swipe still
   scrolls the list: dragging a row starts after a short hold, or immediately from the
   numbered handle.
 - **Skills**: reference rather than testing, with two views. **Focus** (the default) shows
