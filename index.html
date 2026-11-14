@@ -87,6 +87,7 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 // Credentia: California candidate handbook. Headmaster: California Mock Skills (PDF).
 // A trailing 1 on a step marks a critical element step.
 const PL="PL7D7SigffS4ms3_ff_0mGLx55c0sgRlg7";
+const MAXORDER=20;   // most steps an ordering round will ask you to drag
 const PROV={
  credentia:{
   label:"Credentia",
@@ -180,12 +181,18 @@ function setProv(k){
 }
 function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,review})[mode]()}
 
-function order(){
-  const steps=S[skill][1];
+function order(from){
+  const all=S[skill][1];
+  // a long skill is drilled as one random run of consecutive steps, so an
+  // ordering round never asks for fifty rows to be dragged into place
+  const len=Math.min(MAXORDER,all.length);
+  const at=from!==undefined?from:(all.length>len?Math.random()*(all.length-len+1)|0:0);
+  const steps=all.slice(at,at+len);
   // cur[position] = index of the step currently sitting there
   let cur=shuf(steps.map((_,i)=>i));
   if(steps.length>1&&cur.every((v,i)=>v===i))cur=shuf(cur);
-  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}. Drag the steps into the order you would do them, then submit.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="again">Reshuffle</button><button class="b" id="new">Next</button></div>`;
+  const part=all.length>len?` Steps ${at+1}–${at+len} of ${all.length}.`:'';
+  app.innerHTML=`<p class="qtype">Determine Order</p><h2>${esc(S[skill][0])}</h2><p class="hint">Skill ${skill+1}.${part} Drag the steps into the order you would do them, then submit.</p><div class="list" id="pool"></div><div id="out"></div><div class="row"><button class="b p" id="chk">Submit</button><button class="b" id="again">Reshuffle</button><button class="b" id="new">Next</button></div>`;
   const pool=document.getElementById('pool'),out=document.getElementById('out');
   const renumber=()=>[...pool.children].forEach((c,k)=>c.querySelector('.n').textContent=k+1);
   const sync=()=>{cur=[...pool.children].map(c=>+c.dataset.i)};
@@ -243,11 +250,11 @@ function order(){
   function check(){
     let right=0;
     pool.innerHTML=cur.map((i,pos)=>{const ok=i==pos;if(ok)right++;return `<div class="item ${ok?'ok':'no'}"><span class="n${ok?'':' wrong'}">${i+1}</span><span>${steps[i][1]?`<strong>${esc(steps[i][0])}</strong><span class="tag">critical</span>`:esc(steps[i][0])}</span></div>`}).join('');
-    out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol>${steps.map(s=>`<li>${s[1]?`<strong>${esc(s[0])}</strong><span class="tag">critical</span>`:esc(s[0])}</li>`).join('')}</ol></details>`;
+    out.innerHTML=`<p class="score">${right}/${steps.length} in the right position</p><details><summary>Correct order</summary><ol start="${at+1}">${steps.map(s=>`<li>${s[1]?`<strong>${esc(s[0])}</strong><span class="tag">critical</span>`:esc(s[0])}</li>`).join('')}</ol></details>`;
     document.getElementById('chk').disabled=true;
   }
   document.getElementById('chk').onclick=check;
-  document.getElementById('again').onclick=order;
+  document.getElementById('again').onclick=()=>order(at);
   document.getElementById('new').onclick=drill;
   draw();
 }

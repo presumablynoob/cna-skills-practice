@@ -15,7 +15,7 @@ Switching reloads both tabs against that provider's list.
 
 The two lists are not the same material. Headmaster bundles tasks that Credentia keeps separate
 (its bedpan skill also covers measuring urine output and hand washing), so its skills are fewer
-but much longer. Check which provider your test site uses before drilling.
+but much longer – up to 49 steps against Credentia's 20. Check which provider your test site uses before drilling.
 
 ## Modes
 
@@ -23,7 +23,10 @@ but much longer. Check which provider your test site uses before drilling.
   sequence or asks you to mark its critical element steps (missing one fails the skill).
   Each round is labelled "Determine Order" or "Critical Steps" above the skill name. There
   is no skill picker. Ordering rounds are reordered by dragging a step anywhere on its row;
-  press Submit to grade, then Next for another round. On a touch screen a swipe still
+  press Submit to grade, then Next for another round. A skill longer than `MAXORDER` (20) is
+  drilled as one random run of consecutive steps rather than all of it at once, and the round
+  says which run, as in "Steps 14-33 of 48"; Reshuffle keeps that run, Next draws a new one.
+  No Credentia skill is long enough to be split; most Headmaster ones are. On a touch screen a swipe still
   scrolls the list: dragging a row starts after a short hold, or immediately from the
   numbered handle.
 - **Skills**: reference rather than testing, with two views. **Focus** (the default) shows
