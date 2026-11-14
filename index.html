@@ -51,7 +51,9 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .vcred{color:var(--mute);font-size:12px;margin:8px 0 16px}
 .vcred a{color:var(--acc)}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card);margin-bottom:12px}
+.ctl{margin-bottom:14px}
+.ctl select{max-width:100%}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card);flex:none}
 .seg .sb{font:inherit;font-size:13px;font-weight:500;padding:5px 15px;border:0;background:transparent;color:var(--mute);cursor:pointer}
 .seg .sb.on{background:var(--acc);color:#fff}
 .revl.focus{margin:12px 0 18px}
@@ -217,23 +219,29 @@ function review(){
   const n=sk=>sk[1].filter(x=>x[1]).length;
   const stepList=(sk,cls)=>`<ol class="revl${cls||''}">${sk[1].map(st=>`<li>${st[1]?`<strong><em>${esc(st[0])}</em></strong><span class="tag">critical</span>`:esc(st[0])}</li>`).join('')}</ol>`;
   const seg=`<div class="seg"><button class="sb${revView==='focus'?' on':''}" id="vf">Focus</button><button class="sb${revView==='list'?' on':''}" id="vl">List</button></div>`;
+  const pick=revView==='focus'
+    ? `<select id="pick" aria-label="Jump to skill">${S.map((sk,i)=>`<option value="${i}"${i===revIdx?' selected':''}>${i+1}. ${esc(sk[0])}</option>`).join('')}</select>`
+    : '';
+  const ctl=`<div class="row ctl">${seg}${pick}</div>`;
   if(revView==='focus'){
     const sk=S[revIdx],c=n(sk);
     const vid=V[revIdx];
     const video=vid
       ? `<h3 class="vh">Video walkthrough</h3><div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/${vid}" title="${esc(sk[0])} walkthrough" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div><p class="vcred">Video by XY Nursing Skills, not affiliated with Credentia · <a href="https://www.youtube.com/watch?v=${vid}&list=${PL}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a></p>`
       : `<p class="vcred">This playlist has no walkthrough for skill ${revIdx+1} · <a href="https://www.youtube.com/playlist?list=${PL}" target="_blank" rel="noopener noreferrer">browse it on YouTube</a></p>`;
-    app.innerHTML=seg+`<p class="hint">Skill ${revIdx+1} of ${S.length} · ${sk[1].length} steps${c?` · ${c} critical`:' · none flagged critical'}</p><h2>${esc(sk[0])}</h2>`+stepList(sk,' focus')+video+
+    app.innerHTML=ctl+`<p class="hint">Skill ${revIdx+1} of ${S.length} · ${sk[1].length} steps${c?` · ${c} critical`:' · none flagged critical'}</p><h2>${esc(sk[0])}</h2>`+stepList(sk,' focus')+video+
       `<div class="row"><button class="b" id="prev">← Previous</button><button class="b" id="next">Next →</button></div>`;
     document.getElementById('prev').onclick=()=>{revIdx=(revIdx-1+S.length)%S.length;review()};
     document.getElementById('next').onclick=()=>{revIdx=(revIdx+1)%S.length;review()};
   }else{
-    app.innerHTML=seg+`<p class="hint">All ${S.length} skills with their steps in order. Critical element steps are tagged — missing one fails the skill.</p><div class="row"><button class="b" id="exp">Expand all</button><button class="b" id="col">Collapse all</button></div>`+
+    app.innerHTML=ctl+`<p class="hint">All ${S.length} skills with their steps in order. Critical element steps are tagged — missing one fails the skill.</p><div class="row"><button class="b" id="exp">Expand all</button><button class="b" id="col">Collapse all</button></div>`+
       S.map((sk,i)=>`<details class="rev"><summary><strong>${i+1}. ${esc(sk[0])}</strong><span class="cnt">${sk[1].length} steps${n(sk)?` · ${n(sk)} critical`:''}</span></summary>${stepList(sk)}</details>`).join('');
     const all=o=>app.querySelectorAll('details.rev').forEach(d=>d.open=o);
     document.getElementById('exp').onclick=()=>all(true);
     document.getElementById('col').onclick=()=>all(false);
   }
+  const pk=document.getElementById('pick');
+  if(pk)pk.onchange=e=>{revIdx=+e.target.value;review()};
   document.getElementById('vf').onclick=()=>{revView='focus';review()};
   document.getElementById('vl').onclick=()=>{revView='list';review()};
 }
