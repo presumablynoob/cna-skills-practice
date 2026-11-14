@@ -62,7 +62,13 @@ the video section entirely. `blurb`, `src`, `srcName` and `note` fill the subtit
 
 ## Sources
 
-Step wording is quoted verbatim, so corrections belong upstream rather than here.
+Step wording is quoted verbatim, so corrections belong upstream rather than here. Skill *titles*
+are the one exception: both providers' titles are title-cased and have their parenthesised and
+bracketed asides removed, so the two lists read alike ("Catheter Care for a Female Resident with
+Hand Washing", not "CATHETER CARE ... (ONE OF THE POSSIBLE MANDATORY FIRST TASKS) [DEMONSTRATED
+ON A MANIKIN]"). Credentia's own list puts the bracket in the wrong place on skill 16, writing
+"(Prom for One Shoulder)"; that title is restored to "... for One Shoulder" so it is not
+identical to skill 15's.
 
 - **Credentia** — [California candidate handbook skills list](https://kb-nc.credentia.com/en/article/skills).
   Critical element steps are the ones that page sets in bold. In California, manual blood
