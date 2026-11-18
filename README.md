@@ -23,7 +23,8 @@ but much longer – up to 49 steps against Credentia's 20. Check which provider 
   one skill at a time, with a dropdown to jump straight to a skill and Previous/Next buttons
   that wrap around; **List** shows every skill as a collapsible section with Expand/Collapse
   all. Both show every step in order with critical steps bold, italic and tagged, and under
-  Credentia, Focus also embeds that skill's video walkthrough. The chosen view and your place
+  Credentia, Focus also opens with an Equipment list and embeds that skill's video
+  walkthrough. The chosen view and your place
   in it survive switching tabs. Graded lists in Practice Exam keep critical steps bold only.
 
 - **Flashcards**: the Focus view with every step hidden behind a blank line. Tap a line to
@@ -99,6 +100,15 @@ identical to skill 15's.
   candidates, not complete care.
 
 Always check against the official candidate handbook for your state before the exam.
+
+Equipment lists are taken from each skill video's description on that same playlist and
+reworded to one style: "chux" becomes disposable underpad, "TED hose" an elastic stocking,
+"kidney basin" an emesis basin, and "patient" becomes "client" to match the handbook. They
+live in `PROV.credentia.equip`, index-aligned with `skills`: `[]` means the source says none
+are needed (the two range-of-motion skills), and `null` means there is no video to read it
+from (skill 12), which shows no Equipment section at all. Headmaster has `equip: null`
+throughout, since its mock-skills PDF lists no equipment. The lists are only as complete as
+the video descriptions, so check your own kit against the handbook.
 
 Video walkthroughs come from the [Credentia CNA Skills (Updated)](https://www.youtube.com/playlist?list=PL7D7SigffS4ms3_ff_0mGLx55c0sgRlg7)
 playlist by XY Nursing Skills, who state they are not affiliated with Credentia. The playlist has
