@@ -42,6 +42,14 @@ h2{font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:14px 0 6px}
 .item.no{background:var(--bad2);border-color:var(--bad)}
 .item .n.wrong{color:var(--bad);background:transparent;box-shadow:inset 0 0 0 1px var(--bad)}
 .item.miss{background:var(--warn2);border-color:var(--warn)}
+.cards{margin:12px 0 18px;padding-left:32px}
+.cards li{margin:8px 0}
+.fcard{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:none;border:0;padding:0;cursor:pointer}
+.fcard .mask{display:block;height:34px;border:1px dashed var(--line);border-radius:8px;background:var(--card)}
+.fcard:hover .mask{border-color:var(--acc)}
+.fcard .txt{display:none}
+.fcard.on .mask{display:none}
+.fcard.on .txt{display:block}
 .xbar{margin:0 0 16px}
 .xrow{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-size:13px;margin-bottom:8px}
 .xstat{color:var(--mute)}
@@ -169,7 +177,7 @@ let S=PROV[prov].skills, V=PROV[prov].videos||[];
 const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const app=document.getElementById('app');
-const MODES=[["review","Skills"],["drill","Practice Exam"]];
+const MODES=[["review","Skills"],["cards","Flashcards"],["drill","Practice Exam"]];
 let mode="review",skill=-1;   // the page opens on the first tab
 let revView="focus",revIdx=0;  // Skills tab: focus one skill, or list them all
 const tabs=document.getElementById('tabs');
@@ -239,7 +247,7 @@ function setProv(k){
   skill=-1;revIdx=0;exam=null;  // the two lists have different skills and lengths
   chrome();render();
 }
-function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({drill,review})[mode]()}
+function render(){[...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k==mode));({review,cards,drill})[mode]()}
 
 function order(from){
   const all=S[skill][1];
@@ -337,6 +345,19 @@ function crit(){
   };
 }
 
+function cards(){
+  const sk=S[revIdx],c=sk[1].filter(x=>x[1]).length;
+  app.innerHTML=`<div class="row ctl"><select id="pick" aria-label="Jump to skill">${S.map((s,i)=>`<option value="${i}"${i===revIdx?' selected':''}>${i+1}. ${esc(s[0])}</option>`).join('')}</select></div>`+
+    `<p class="hint">Skill ${revIdx+1} of ${S.length} · ${sk[1].length} steps${c?` · ${c} critical`:''}. Say each step out loud, then tap its line to check yourself.</p>`+
+    `<h2>${esc(sk[0])}</h2>`+
+    `<ol class="cards">${sk[1].map(st=>`<li><button class="fcard"><span class="mask"></span><span class="txt">${st[1]?`<strong><em>${esc(st[0])}</em></strong><span class="tag">critical</span>`:esc(st[0])}</span></button></li>`).join('')}</ol>`+
+    `<div class="row"><button class="b" id="hideall">Hide all</button><button class="b" id="prev">← Previous</button><button class="b" id="next">Next →</button></div>`;
+  app.querySelectorAll('.fcard').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+  document.getElementById('hideall').onclick=()=>app.querySelectorAll('.fcard.on').forEach(b=>b.classList.remove('on'));
+  document.getElementById('prev').onclick=()=>{revIdx=(revIdx-1+S.length)%S.length;cards()};
+  document.getElementById('next').onclick=()=>{revIdx=(revIdx+1)%S.length;cards()};
+  document.getElementById('pick').onchange=e=>{revIdx=+e.target.value;cards()};
+}
 function review(){
   const n=sk=>sk[1].filter(x=>x[1]).length;
   const stepList=(sk,cls)=>`<ol class="revl${cls||''}">${sk[1].map(st=>`<li>${st[1]?`<strong><em>${esc(st[0])}</em></strong><span class="tag">critical</span>`:esc(st[0])}</li>`).join('')}</ol>`;

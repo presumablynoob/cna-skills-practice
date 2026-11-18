@@ -26,6 +26,12 @@ but much longer – up to 49 steps against Credentia's 20. Check which provider 
   Credentia, Focus also embeds that skill's video walkthrough. The chosen view and your place
   in it survive switching tabs. Graded lists in Practice Exam keep critical steps bold only.
 
+- **Flashcards**: the Focus view with every step hidden behind a blank line. Tap a line to
+  reveal that step, tap it again to hide it, and Hide all covers the lot again. The same
+  dropdown and Previous/Next move between skills, and moving to another skill starts it fully
+  hidden. Revealed steps keep their critical bold, italic and tag. No video here, since the
+  walkthrough would give the answers away.
+
 - **Practice Exam**: a fixed-length exam. Opening the tab asks for a length (10, 20 or 35
   questions) and a Start exam button. Each question draws a skill at random and either puts
   its steps in order or asks for its critical element steps; the round is labelled "Determine
